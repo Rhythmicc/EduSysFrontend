@@ -52,7 +52,7 @@ export default {
         }
     },
     mounted() {
-        this.formItem.user_id = this.$storage.getBindUser();
+        this.formItem = this.$storage.getBindUser();
     },
     methods: {
         handleSubmit() {

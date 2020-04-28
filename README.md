@@ -1,6 +1,4 @@
-# edusysfrontend
-
-> 中国石油大学(北京)教务系统
+# 中国石油大学(北京)教务系统
 
 #### Build Setup
 
