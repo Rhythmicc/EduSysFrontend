@@ -53,8 +53,10 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "echarts": "^4.7.0",
     "electron-json-storage": "^4.1.8",
     "element-ui": "^2.13.1",
+    "iview": "^3.5.4",
     "request-promise": "^4.2.5",
     "vue": "^2.6.11",
     "vue-electron": "^1.0.6",

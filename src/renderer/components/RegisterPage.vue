@@ -128,9 +128,10 @@ export default {
                         message: "成功注册",
                         type: 'success'
                     });
+                    this.$storage.saveUser({user_id: fm.user_id, password:fm.pwd});
                     setTimeout(()=>{
                         goto_login();
-                    }, 3000);
+                    }, 2000);
                 } else this.$message.error("注册失败！" + res.msg);
             }).catch(err => {
                 this.$message.error(err);
