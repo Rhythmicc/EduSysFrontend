@@ -19,7 +19,7 @@
   },
   "build": {
     "productName": "CUP教务系统",
-    "appId": "com.rhythmlian.edusys",
+    "appId": "916822670@qq.com",
     "directories": {
       "output": "build"
     },
@@ -57,6 +57,7 @@
     "electron-json-storage": "^4.1.8",
     "element-ui": "^2.13.1",
     "iview": "^3.5.4",
+    "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "vue": "^2.6.11",
     "vue-electron": "^1.0.6",

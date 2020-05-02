@@ -98,23 +98,17 @@ export default {
     mounted() {
     },
     methods: {
-        checkRePassword(rule, value, callback){
-            var fm = this.role === 'student'? this.studentForm : this.role === 'teacher'? this.teacherForm : this.managerForm;
-            if(value === '')return callback(new Error('请再次输入密码'));
-            else if(value !== fm.pwd)return callback(new Error('两次密码不一致'))
-            else callback();
-        },
         goto_login(){
             this.$router.push({name: 'login-page'});
         },
         submit() {
-            var fm = this.role === 'student'? this.studentForm : this.role === 'teacher'? this.teacherForm : this.managerForm;
-            for(var i in fm)if(!fm[i])return
+            const fm = this.role === 'student' ? this.studentForm : this.role === 'teacher' ? this.teacherForm : this.managerForm;
+            for(const i in fm)if(!fm[i])return
             if(fm.pwd !== this.repassword){
                 this.$message.error('确认密码失败！')
                 return
             }
-            var api = this.$storage.address() + 'register/' + this.role
+            const api = this.$storage.address() + 'register/' + this.role;
             request({
                 uri: api,
                 method: 'POST',
@@ -130,7 +124,7 @@ export default {
                     });
                     this.$storage.saveUser({user_id: fm.user_id, password:fm.pwd});
                     setTimeout(()=>{
-                        goto_login();
+                        this.goto_login();
                     }, 2000);
                 } else this.$message.error("注册失败！" + res.msg);
             }).catch(err => {

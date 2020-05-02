@@ -23,7 +23,7 @@
                         <el-form-item>
                             <div class="buttons layout">
                                 <el-button type="success" @click="handleSubmit()">登录</el-button>
-                                <el-button type="primary" @click="Register()" style="margin-left: 8px">注册</el-button>
+                                <el-button type="primary" @click="register()" style="margin-left: 8px">注册</el-button>
                             </div>
                         </el-form-item>
                     </el-form>
@@ -52,12 +52,13 @@ export default {
         }
     },
     mounted() {
-        this.formItem = this.$storage.getBindUser();
+        let res = this.$storage.getBindUser();
+        if(JSON.stringify(res) !== 'null')this.formItem = res;
     },
     methods: {
         handleSubmit() {
-            if(!(this.formItem.user_id && this.formItem.user_id))return;
-            var api = this.$storage.address() + "login/"
+            if(!(this.formItem.user_id))return;
+            const api = this.$storage.address() + "login/";
             request({
                 uri: api + this.formItem.user_id + "?pwd=" + this.formItem.password,
                 method: 'GET',
@@ -69,6 +70,7 @@ export default {
                         type: 'success'
                     });
                     setTimeout(() => {
+                        this.$storage.saveRole(res.role)
                         if(res.role === 0){
                             this.$storage.saveUser(this.formItem, () => {
                                 this.$router.push({
@@ -97,11 +99,8 @@ export default {
                 } else this.$message.error("登录失败！");
             })
         },
-        handleReset() {
-            this.formItem.user_id = '';
-            this.formItem.password = '';
-        },
-        Register() {
+
+        register() {
             this.$router.push({
                 name: 'register-page',
             }).catch(data => {
@@ -111,12 +110,6 @@ export default {
     }
 }
 </script>
-
-<style>
-    .ivu-select-dropdown {
-        max-height: 100px;
-    }
-</style>
 
 <style lang="scss" scope>
     @import "../style/params";

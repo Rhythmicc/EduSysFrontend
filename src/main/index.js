@@ -117,7 +117,8 @@ const getMenuData = function () {
                           });
                       }
                   }
-              }
+              },
+              {role: 'toggledevtools', label: '开发者工具'},
           ]
       },
       {
@@ -152,7 +153,7 @@ const getMenuData = function () {
           if (aboutWindow) {
               aboutWindow.show();
           } else {
-              aboutWindow = new BrowserWindow({
+              let aboutWindow = new BrowserWindow({
                   width: 300,
                   height: 300,
                   resizable: false,

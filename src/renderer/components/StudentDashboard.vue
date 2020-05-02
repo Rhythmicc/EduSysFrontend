@@ -5,7 +5,7 @@
                 <el-page-header content="学生主页" style="margin-top: 27px" @back="goback"></el-page-header>
             </el-col>
             <el-col :span="8" style="width: 80%">
-                <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" style="float: right">
+                <el-menu class="el-menu-demo" mode="horizontal" @select="headerSelect" style="float: right">
                     <el-submenu index="1">
                         <template slot="title"><el-badge :value="12" :max="9" style="margin-top: 10px;">消息</el-badge></template>
                         <el-menu-item>1212</el-menu-item>
@@ -103,9 +103,7 @@
                 <el-row style="-webkit-app-region: no-drag" :gutter="5">
                     <el-col style="width: 50%;">
                         <el-card shadow="hover">
-                            <div slot="header">
-                                <span>个人信息</span>
-                            </div>
+                            <div slot="header"><span>个人信息</span></div>
                             <div v-for="item in infoTable" v-bind:key="item.key"><p>{{item.key + '：' + item.val}}</p></div>
                         </el-card>
                     </el-col>
@@ -122,7 +120,7 @@
                             <div>
                                 <div>{{data.day.split('-')[2]}}</div>
                                 <div v-for="item in calendarData" v-bind:key="item.things">
-                                    <div v-if="(item.days).indexOf(data.day.split('-')[2])!=-1">
+                                    <div v-if="(item.days).indexOf(data.day.split('-')[2])!==-1">
                                         <el-tooltip class="item" effect="dark" :content="item.things" placement="right" style="text-align: right; font-size: 12px">
                                             <div>{{item.things}}</div>
                                         </el-tooltip>
@@ -153,7 +151,60 @@ export default {
                 {days: ['30'], things: '法语文化专题'},
                 {days: ['28', '30'], things: '单片机'},
                 {days: ['29', '01'], things: '软件工程'}
-            ]
+            ],
+            action_tree: {
+                '1': {
+                    "1": {
+                        "1": "StudyInfo",
+                        "2": "ChangeInfo",
+                        "3": "rp-info",
+                        "4": "StuInfoMove",
+                        "5": "EleRegister",
+                        "6": "ParentInfo",
+                        "7": "MinorScheme",
+                        "8": "StuCardPreserve"
+                    },
+                    "2": "StudentMove",
+                    "3": {
+                        "1": "ChooseProblem",
+                        "2": "SubmitPaper",
+                        "3": "QueryPaperGrade",
+                        "4": "GoodPaperList"
+                    }
+                },
+                "2": {
+                    "1": {
+                        "1": "CurCourseTable",
+                        "2": "HisCourseTable"
+                    },
+                    "2": {
+                        "1": "SpecialChooseCourse",
+                        "2": "NormalChooseCourse",
+                        "3": "ChooseCourseResult",
+                        "4": "DropCourse"
+                    }
+                },
+                "3": {
+                    "1": "ComprehensiveInquiry",
+                    "2": "TeachEvaluate"
+                },
+                "4": {
+                    "1": "ExamPlan",
+                    "2": "ExamGrade"
+                },
+                "5": {
+                    "1": "CultureProgramProcess",
+                    "2": "GuideProgramProcess",
+                    "3": {
+                        "1": "CourseAlert",
+                        "2": "CoursesInfo"
+                    },
+                    "4": {
+                        "1": "FreeClassroom",
+                        "2": "OrderClassroom"
+                    }
+                }
+            }
         }
     },
     mounted() {
@@ -166,16 +217,26 @@ export default {
     },
     methods: {
         goback(){
+            this.$storage.saveUserInfo("null")
             this.$router.push({name: 'login-page'})
         },
 
+        headerSelect(key, keyPath){
+            if(key === "1")console.log(key)
+            else console.log(key)
+        },
+
         handleSelect(key, keyPath) {
-            console.log(key, keyPath);
+            let road = key.split('-')
+            let act = this.action_tree;
+            for(const i in road)act = act[road[i]]
+            console.log(act)
+            this.$router.push({name: act})
         },
 
         init_info() {
             this.info = this.$storage.getUserInfo();
-            if(JSON.stringify(this.info)!='null'){
+            if(this.info && JSON.stringify(this.info) !== "null") {
                 this.init_info_table();
                 return
             }
@@ -194,7 +255,7 @@ export default {
         },
 
         init_info_table() {
-            if(JSON.stringify(this.info)=='null')this.init_info();
+            if(!this.info || JSON.stringify(this.info)==='null')this.init_info();
             this.infoTable = [{
                 key: '账户',
                 val: this.info.user_id
@@ -217,103 +278,103 @@ export default {
         },
 
         formatDate(date) {
-            var y = date.getFullYear();
-            var m = date.getMonth() + 1;
-            var d = date.getDate();
+            const y = date.getFullYear();
+            const m = date.getMonth() + 1;
+            const d = date.getDate();
             return y + '-' + m + '-' + d;
         },
 
         init_date() {
-            var now = new Date();
-            var dayOfWeek = now.getDay();
+            const now = new Date();
+            const dayOfWeek = now.getDay();
             this.fromDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1));
             this.toDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7));
         },
 
         drawCharts() {
             let chart = echarts.init(document.getElementById('CPLchart'))
-            var option = {
-                title : {
+            const option = {
+                title: {
                     text: '保有储量变化图',
                     subtext: '一次能源'
                 },
-                tooltip : {
+                tooltip: {
                     trigger: 'axis'
                 },
                 legend: {
-                    data:['煤','石油','天然气']
+                    data: ['煤', '石油', '天然气']
                 },
                 toolbox: {
-                    show : true,
-                    feature : {
-                        dataView : {show: true, readOnly: false},
-                        magicType : {show: true, type: ['line', 'bar']},
-                        restore : {show: true},
-                        saveAsImage : {show: true}
+                    show: true,
+                    feature: {
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
                     }
                 },
-                calculable : true,
-                xAxis : [
+                calculable: true,
+                xAxis: [
                     {
-                        type : 'category',
-                        data : ['2009','2010','2011','2012','2013','2014','2015','2016','2017'],
+                        type: 'category',
+                        data: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017'],
                         splitNumber: 10
                     }
                 ],
-                yAxis : [
+                yAxis: [
                     {
-                        type : 'value'
+                        type: 'value'
                     }
                 ],
-                series : [
+                series: [
                     {
-                        name:'煤',
-                        type:'bar',
-                        data:[1683.47,1654.23,1640.12,1641.6,1639.68,1642.7,1610.41,1639.45,1722.2],
-                        markPoint : {
-                            data : [
-                                {type : 'max', name: '最大值'},
-                                {type : 'min', name: '最小值'}
+                        name: '煤',
+                        type: 'bar',
+                        data: [1683.47, 1654.23, 1640.12, 1641.6, 1639.68, 1642.7, 1610.41, 1639.45, 1722.2],
+                        markPoint: {
+                            data: [
+                                {type: 'max', name: '最大值'},
+                                {type: 'min', name: '最小值'}
                             ]
                         },
-                        markLine : {
-                            data : [
-                                {type : 'average', name: '平均值'}
+                        markLine: {
+                            data: [
+                                {type: 'average', name: '平均值'}
                             ]
                         }
                     },
                     {
-                        name:'石油',
-                        type:'bar',
-                        data:[22490.2,24947.67,29844.34,31397.94,33713,36300.8,38445.3,38375.6,38158.7],
-                        markPoint : {
-                            data : [
-                                {type : 'max', name: '最大值'},
-                                {type : 'min', name: '最小值'}
+                        name: '石油',
+                        type: 'bar',
+                        data: [22490.2, 24947.67, 29844.34, 31397.94, 33713, 36300.8, 38445.3, 38375.6, 38158.7],
+                        markPoint: {
+                            data: [
+                                {type: 'max', name: '最大值'},
+                                {type: 'min', name: '最小值'}
                             ]
                         },
-                        markLine : {
-                            data : [
-                                {type : 'average', name : '平均值'}
+                        markLine: {
+                            data: [
+                                {type: 'average', name: '平均值'}
                             ]
                         }
                     },
                     {
-                        name:'天然气',
-                        type:'bar',
-                        data:[5502.54,5628.11,5478,6376.26,6231.14,8047.88,7857.1,7802.5,8695.01],
-                        markPoint : {
-                            data : [
-                                {type : 'max', name: '最大值'},
-                                {type : 'min', name: '最小值'}
+                        name: '天然气',
+                        type: 'bar',
+                        data: [5502.54, 5628.11, 5478, 6376.26, 6231.14, 8047.88, 7857.1, 7802.5, 8695.01],
+                        markPoint: {
+                            data: [
+                                {type: 'max', name: '最大值'},
+                                {type: 'min', name: '最小值'}
                             ]
                         },
-                        markLine : {
-                            data : [
-                                {type : 'average', name : '平均值'}
+                        markLine: {
+                            data: [
+                                {type: 'average', name: '平均值'}
                             ]
                         }
-                    }  
+                    }
                 ]
             };
             chart.setOption(option);
@@ -321,6 +382,7 @@ export default {
     }
 };
 </script>
+
 <style lang="scss">
     @import "../style/params";
 
@@ -350,19 +412,12 @@ export default {
     .buttons {
         margin-top: 50px;
     }
-
-    .right {
-        align-items: right;
-        justify-content: right;
-    }
 </style>
+
 <style type="text/css">
     html,body,#app,.el-container{
-        /*设置内部填充为0，几个布局元素之间没有间距*/
-        padding: 0px;
-         /*外部间距也是如此设置*/
-        margin: 0px;
-        /*统一设置高度为100%*/
+        padding: 0;
+        margin: 0;
         height: 100%;
     }
 </style>

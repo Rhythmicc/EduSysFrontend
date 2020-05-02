@@ -1,5 +1,6 @@
 const user_key = "user"
 const info_key = "UserInfo"
+const role_key = "role"
 
 export default class backend {
     address() {
@@ -11,6 +12,12 @@ export default class backend {
     saveUser(user, callback) {
         localStorage.setItem(user_key, JSON.stringify(user))
         callback && callback();
+    }
+    getRole() {
+        return sessionStorage.getItem(role_key)
+    }
+    saveRole(role) {
+        sessionStorage.setItem(role_key, role)
     }
     getUserInfo() {
         if(!this.info)this.info = JSON.parse(sessionStorage.getItem(info_key))

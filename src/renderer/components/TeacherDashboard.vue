@@ -1,108 +1,294 @@
 <template>
-    <el-container style="height: 980px; -webkit-app-region: drag">
-        <el-header style="font-size: 12px; -webkit-app-region: drag">
-            <el-row>
-                <el-col :span="8" style="width: 20%">
-                    <el-page-header content="教师主页" style="margin-top: 16px" @back="goback"></el-page-header>
-                </el-col>
-                <el-col :span="8" style="width: 75%">
-                    <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" style="float: right">
-                        <el-submenu index="1">
-                            <template slot="title"><el-badge :value="12" :max="9">评论</el-badge></template>
-                            <el-menu-item>1212</el-menu-item>
-                        </el-submenu>
-                        <el-submenu index=2>
-                            <template slot="title"><el-badge :value="3" :max="9">回复</el-badge></template>
-                            <el-menu-item>33</el-menu-item>
-                        </el-submenu>
-                    </el-menu>
-                </el-col>
-                <el-col>
-                    <el-icon-arrow-down></el-icon-arrow-down>
-                </el-col>
-            </el-row>
+    <el-container style="-webkit-app-region: drag" direction="vertical">
+        <el-header style="font-size: 12px; -webkit-app-region: drag; border: 2px;">
+            <el-col :span="8" style="width: 20%">
+                <el-page-header content="教师主页" style="margin-top: 27px" @back="goback"></el-page-header>
+            </el-col>
+            <el-col :span="8" style="width: 80%">
+                <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" style="float: right">
+                    <el-submenu index="1">
+                        <template slot="title"><el-badge :value="12" :max="9" style="margin-top: 10px;">消息</el-badge></template>
+                        <el-menu-item>1212</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index=2>
+                        <template slot="title"><el-badge :value="3" :max="9" style="margin-top: 10px;">代办事项</el-badge></template>
+                        <el-menu-item>33</el-menu-item>
+                    </el-submenu>
+                </el-menu>
+            </el-col>
         </el-header>
         <el-container style="height: 100%">
             <el-aside width="240px" style="background-color: rgb(238, 241, 246); -webkit-app-region: no-drag">
-                <el-menu class="el-menu-vertical-demo" @select="handleSelect">
-                    <el-menu-item index="1">处理中心</el-menu-item>
+                <el-menu class="el-menu-vertical-demo" @select="handleSelect" :default-active="activeIndex">
+                    <el-menu-item index="1"><i class="el-icon-s-custom"></i>个人管理</el-menu-item>
                     <el-submenu index="2">
-                        <template slot="title">我的工作台</template>
-                        <el-menu-item index="2-1">选项1</el-menu-item>
-                        <el-menu-item index="2-2">选项2</el-menu-item>
-                        <el-menu-item index="2-3">选项3</el-menu-item>
-                        <el-submenu index="2-4">
-                        <template slot="title">选项4</template>
-                        <el-menu-item index="2-4-1">选项1</el-menu-item>
-                        <el-menu-item index="2-4-2">选项2</el-menu-item>
-                        <el-menu-item index="2-4-3">选项3</el-menu-item>
+                        <template slot="title">
+                            <i class="el-icon-s-claim"></i>
+                            课程管理
+                        </template>
+                        <el-submenu index="2-1">
+                            <template slot="title">课表</template>
+                            <el-menu-item index="2-1-1">本学期课表</el-menu-item>
+                            <el-menu-item index="2-1-2">历史课表</el-menu-item>
+                        </el-submenu>
+                        <el-menu-item index="2-2">授课管理</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="3">
+                        <template slot="title">
+                            <i class="el-icon-star-on"></i>
+                            教学评估
+                        </template>
+                        <el-menu-item index="3-1">综合调查</el-menu-item>
+                        <el-menu-item index="3-2">评估结果</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="4">
+                        <template slot="title">
+                            <i class="el-icon-message-solid"></i>
+                            考务管理
+                        </template>
+                        <el-menu-item index="4-1">申请考试</el-menu-item>
+                        <el-menu-item index="4-2">成绩发布</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="5">
+                        <template slot="title">
+                            <i class="el-icon-search"></i>
+                            综合查询
+                        </template>
+                        <el-submenu index="5-1">
+                            <template slot="title">课程</template>
+                            <el-menu-item index="5-3-1">课程通知</el-menu-item>
+                            <el-menu-item index="5-3-2">课程属性</el-menu-item>
+                        </el-submenu>
+                        <el-submenu index="5-2">
+                            <template slot="title">教室</template>
+                            <el-menu-item index="5-4-1">空闲教室</el-menu-item>
+                            <el-menu-item index="5-4-2">预约教室</el-menu-item>
                         </el-submenu>
                     </el-submenu>
-                    <el-menu-item index="3" disabled>消息中心</el-menu-item>
                 </el-menu>
             </el-aside>
             <el-main height="100%">
-                <el-row style="-webkit-app-region: no-drag" :gutter="10">
-                    <el-col :span="8" style="width: 50%">
+                <el-row style="-webkit-app-region: no-drag" :gutter="5">
+                    <el-col style="width: 50%;">
                         <el-card shadow="hover">
-                            <p>账户：{{info.user_id}}</p>
-                            <p>姓名：{{info.name}}</p>
-                            <p>性别：{{info.gender}}</p>
-                            <p>学院：{{info.college}}</p>
-                            <p>专业：{{info.profession}}</p>
+                            <div slot="header"><span>个人信息</span></div>
+                            <div v-for="item in infoTable" v-bind:key="item.key"><p>{{item.key + '：' + item.val}}</p></div>
                         </el-card>
                     </el-col>
-                    <el-col :span="8" style="width: 50%">
+                    <el-col style="width: 50%">
                         <el-card shadow="hover">
-                            方案选修完成情况；
+                            <div id="CPLchart" style="width: 100%; height: 303px;"></div>
                         </el-card>
                     </el-col>
+                </el-row>
+                <el-row style="-webkit-app-region: no-drag" :gutter="5">
+                    <el-card :span="8" style="width: 100%" shadow="hover">
+                        <el-calendar :range="[fromDate, toDate]">
+                            <template slot="dateCell" slot-scope="{date, data}">
+                                <div>
+                                    <div>{{data.day.split('-')[2]}}</div>
+                                    <div v-for="item in calendarData" v-bind:key="item.things">
+                                        <div v-if="(item.days).indexOf(data.day.split('-')[2])!==-1">
+                                            <el-tooltip class="item" effect="dark" :content="item.things" placement="right" style="text-align: right; font-size: 12px">
+                                                <div>{{item.things}}</div>
+                                            </el-tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-calendar>
+                    </el-card>
                 </el-row>
             </el-main>
         </el-container>
     </el-container>
 </template>
 <script>
-import request from 'request-promise'
-export default {
-    data() {
-        return {
-            info: ''
-        }
-    },
-    mounted() {
-        this.init_info();
-    },
-    created() {
-        this.user = this.$storage.getBindUser();
-        this.info = this.$storage.getUserInfo();
-    },
-    methods: {
-        goback(){
-            this.$router.push({name: 'login-page'})
+    import request from 'request-promise'
+    import echarts from 'echarts'
+    export default {
+        data() {
+            return {
+                info: '',
+                infoTable: [],
+                activeIndex: '',
+                fromDate: '',
+                toDate: '',
+                calendarData: [
+                    {days: ['28', '30'], things: '计算机网络'},
+                    {days: ['30'], things: '法语文化专题'},
+                    {days: ['28', '30'], things: '单片机'},
+                    {days: ['29', '01'], things: '软件工程'}
+                ]
+            }
         },
-
-        handleSelect(key, keyPath) {
-            console.log(key, keyPath);
+        mounted() {
+            this.init_info();
+            this.drawCharts();
         },
+        created() {
+            this.user = this.$storage.getBindUser();
+            this.init_date();
+        },
+        methods: {
+            goback(){
+                this.$storage.saveUserInfo("null")
+                this.$router.push({name: 'login-page'})
+            },
 
-        init_info() {
-            if(this.info)return
-            request({
-                uri: this.$storage.address() + 'info/teacher/' + this.user.user_id,
-                method: 'GET',
-                json: true
-            }).then(res => {
-                this.info = res;
-                this.info.gender = res.gender?'男':'女'
-                this.$storage.saveUserInfo(this.info)
-            }).catch(err => {
-                this.$message.error(err);
-            })
+            handleSelect(key, keyPath) {
+                console.log(key, keyPath);
+            },
+
+            init_info() {
+                this.info = this.$storage.getUserInfo();
+                if(this.info && JSON.stringify(this.info) !== "null") {
+                    this.init_info_table();
+                    return
+                }
+                request({
+                    uri: this.$storage.address() + 'info/teacher/' + this.user.user_id,
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.info = res;
+                    this.info.gender = res.gender?'男':'女'
+                    this.$storage.saveUserInfo(this.info)
+                    this.init_info_table();
+                }).catch(err => {
+                    this.$message.error(err);
+                });
+            },
+
+            init_info_table() {
+                if(!this.info || JSON.stringify(this.info)==='null')this.init_info();
+                this.infoTable = [{
+                    key: '账户',
+                    val: this.info.user_id
+                }, {
+                    key: '姓名',
+                    val: this.info.name
+                }, {
+                    key: '性别',
+                    val: this.info.gender
+                }, {
+                    key: '学院',
+                    val: this.info.college,
+                }, {
+                    key: '职称',
+                    val: this.info.title
+                }, {
+                    key: '授课',
+                    val: '软件工程'
+                }]
+            },
+
+            formatDate(date) {
+                const y = date.getFullYear();
+                const m = date.getMonth() + 1;
+                const d = date.getDate();
+                return y + '-' + m + '-' + d;
+            },
+
+            init_date() {
+                const now = new Date();
+                const dayOfWeek = now.getDay();
+                this.fromDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1));
+                this.toDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7));
+            },
+
+            drawCharts() {
+                let chart = echarts.init(document.getElementById('CPLchart'))
+                const option = {
+                    title: {
+                        text: '保有储量变化图',
+                        subtext: '一次能源'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['煤', '石油', '天然气']
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            dataView: {show: true, readOnly: false},
+                            magicType: {show: true, type: ['line', 'bar']},
+                            restore: {show: true},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    calculable: true,
+                    xAxis: [
+                        {
+                            type: 'category',
+                            data: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017'],
+                            splitNumber: 10
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value'
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '煤',
+                            type: 'bar',
+                            data: [1683.47, 1654.23, 1640.12, 1641.6, 1639.68, 1642.7, 1610.41, 1639.45, 1722.2],
+                            markPoint: {
+                                data: [
+                                    {type: 'max', name: '最大值'},
+                                    {type: 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'}
+                                ]
+                            }
+                        },
+                        {
+                            name: '石油',
+                            type: 'bar',
+                            data: [22490.2, 24947.67, 29844.34, 31397.94, 33713, 36300.8, 38445.3, 38375.6, 38158.7],
+                            markPoint: {
+                                data: [
+                                    {type: 'max', name: '最大值'},
+                                    {type: 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'}
+                                ]
+                            }
+                        },
+                        {
+                            name: '天然气',
+                            type: 'bar',
+                            data: [5502.54, 5628.11, 5478, 6376.26, 6231.14, 8047.88, 7857.1, 7802.5, 8695.01],
+                            markPoint: {
+                                data: [
+                                    {type: 'max', name: '最大值'},
+                                    {type: 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'}
+                                ]
+                            }
+                        }
+                    ]
+                };
+                chart.setOption(option);
+            }
         }
-    }
-};
+    };
 </script>
+
 <style lang="scss">
     @import "../style/params";
 
@@ -132,9 +318,12 @@ export default {
     .buttons {
         margin-top: 50px;
     }
+</style>
 
-    .right {
-        align-items: right;
-        justify-content: right;
+<style type="text/css">
+    html,body,#app,.el-container{
+        padding: 0;
+        margin: 0;
+        height: 100%;
     }
 </style>
