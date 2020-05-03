@@ -2,7 +2,7 @@
     <el-container style="-webkit-app-region: drag" direction="vertical">
         <el-header style="font-size: 12px; -webkit-app-region: drag; border: 2px;">
             <el-col :span="8" style="width: 20%">
-                <el-page-header content="学生主页" style="margin-top: 27px" @back="goback"></el-page-header>
+                <el-page-header content="本学期课表" style="margin-top: 27px" @back="goback"></el-page-header>
             </el-col>
             <el-col :span="8" style="width: 80%">
                 <el-menu class="el-menu-demo" mode="horizontal" @select="headerSelect" style="float: right">
@@ -18,92 +18,45 @@
             </el-col>
         </el-header>
         <el-container style="height: 100%">
-            <el-aside width="240px" style="background-color: rgb(238, 241, 246); -webkit-app-region: no-drag">
-                <el-menu class="el-menu-vertical-demo" @select="handleSelect" :default-active="activeIndex">
-                    <el-submenu index="1">
-                        <template slot="title">
-                            <i class="el-icon-s-custom"></i>
-                            个人管理
+            <el-table :data="timeData" style="width: 80%; margin-top: 10%" align="center">
+                <el-table-column label="周" fixed="left" prop="label" align="center"></el-table-column>
+                <el-table-column label="上午" align="center">
+                    <el-table-column
+                            v-for="(v, i) in titleData" :key="i"
+                            v-if="v.label === '上午'" align="center">
+                        <template slot="header" slot-scope="scope">
+                            <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
                         </template>
-                        <el-submenu index="1-1">
-                            <template slot="title">学籍管理</template>
-                            <el-menu-item index="1-1-1">学生学籍信息</el-menu-item>
-                            <el-menu-item index="1-1-2">个人信息修改</el-menu-item>
-                            <el-menu-item index="1-1-3">学籍异动</el-menu-item>
-                            <el-menu-item index="1-1-4">奖惩信息</el-menu-item>
-                            <el-menu-item index="1-1-5">电子注册</el-menu-item>
-                            <el-menu-item index="1-1-6">监护人信息采集</el-menu-item>
-                            <el-menu-item index="1-1-7">辅修方案</el-menu-item>
-                            <el-menu-item index="1-1-8">学生证信息维护</el-menu-item>
-                        </el-submenu>
-                        <el-menu-item index="1-2">学生异动</el-menu-item>
-                        <el-submenu index="1-3">
-                            <template slot="title">毕业设计</template>
-                            <el-menu-item index="1-3-1">网上选题</el-menu-item>
-                            <el-menu-item index="1-3-2">论文提交</el-menu-item>
-                            <el-menu-item index="1-3-3">毕业设计成绩查询</el-menu-item>
-                            <el-menu-item index="1-3-4">优秀毕业设计名单</el-menu-item>
-                        </el-submenu>
-                    </el-submenu>
-                    <el-submenu index="2">
-                        <template slot="title">
-                            <i class="el-icon-s-claim"></i>
-                            课程管理
+                        <template slot-scope="scope">
+                            <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
                         </template>
-                        <el-submenu index="2-1">
-                            <template slot="title">课表</template>
-                            <el-menu-item index="2-1-1">本学期课表</el-menu-item>
-                            <el-menu-item index="2-1-2">历史课表</el-menu-item>
-                        </el-submenu>
-                        <el-submenu index="2-2">
-                            <template slot="title">选课管理</template>
-                            <el-menu-item index="2-2-1">特殊选课</el-menu-item>
-                            <el-menu-item index="2-2-2">普通选课</el-menu-item>
-                            <el-menu-item index="2-2-3">选课结果</el-menu-item>
-                            <el-menu-item index="2-2-4">退课申请</el-menu-item>
-                        </el-submenu>
-                    </el-submenu>
-                    <el-submenu index="3">
-                        <template slot="title">
-                            <i class="el-icon-star-on"></i>
-                            教学评估
+                    </el-table-column>
+                </el-table-column>
+                <el-table-column label="下午" align="center">
+                    <el-table-column
+                            v-for="(v, i) in titleData" :key="i"
+                            v-if="v.label === '下午'" align="center">
+                        <template slot="header" slot-scope="scope">
+                            <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
                         </template>
-                        <el-menu-item index="3-1">综合调查</el-menu-item>
-                        <el-menu-item index="3-2">教学评估</el-menu-item>
-                    </el-submenu>
-                    <el-submenu index="4">
-                        <template slot="title">
-                            <i class="el-icon-message-solid"></i>
-                            考务管理
+                        <template slot-scope="scope">
+                            <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
                         </template>
-                        <el-menu-item index="4-1">考试安排</el-menu-item>
-                        <el-menu-item index="4-2">考试成绩</el-menu-item>
-                    </el-submenu>
-                    <el-submenu index="5">
-                        <template slot="title">
-                            <i class="el-icon-search"></i>
-                            综合查询
+                    </el-table-column>
+                </el-table-column>
+                <el-table-column label="晚上" align="center">
+                    <el-table-column
+                            v-for="(v, i) in titleData" :key="i"
+                            v-if="v.label === '晚上'" align="center">
+                        <template slot="header" slot-scope="scope">
+                            <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
                         </template>
-                        <el-menu-item index="5-1">培养方案完成情况</el-menu-item>
-                        <el-menu-item index="5-2">指导计划完成情况</el-menu-item>
-                        <el-submenu index="5-3">
-                            <template slot="title">课程</template>
-                            <el-menu-item index="5-3-1">课程通知</el-menu-item>
-                            <el-menu-item index="5-3-2">课程属性</el-menu-item>
-                        </el-submenu>
-                        <el-submenu index="5-4">
-                            <template slot="title">教室</template>
-                            <el-menu-item index="5-4-1">空闲教室</el-menu-item>
-                            <el-menu-item index="5-4-2">预约教室</el-menu-item>
-                        </el-submenu>
-                    </el-submenu>
-                </el-menu>
-            </el-aside>
-            <el-main height="100%">
-                <el-table>
-
-                </el-table>
-            </el-main>
+                        <template slot-scope="scope">
+                            <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
+                        </template>
+                    </el-table-column>
+                </el-table-column>
+            </el-table>
         </el-container>
     </el-container>
 </template>
@@ -112,58 +65,120 @@
     export default {
         data() {
             return {
-                info: '',
-                infoTable: [],
-                activeIndex: '',
                 fromDate: '',
                 toDate: '',
+                courseKey:['oneC','twoC','threeC','fourC','fiveC','sixC'],//科目key值
+                roomKey:['oneR','twoR','threeR','fourR','fiveR','sixR'],//老师key值
+                titleData:[
+                    {
+                        id:'1',
+                        count:1,
+                        label:'上午',
+                        startTime:'08:00',
+                        endTime:'09:50'
+                    },
+                    {
+                        id: '2',
+                        count: 2,
+                        label: '上午',
+                        startTime: '10:05',
+                        endTime: '11:50'
+                    },
+                    {
+                        id: '3',
+                        count: 3,
+                        label: '下午',
+                        startTime: '13:30',
+                        endTime: '15:15'
+                    },
+                    {
+                        id: '4',
+                        count: 4,
+                        label: '下午',
+                        startTime: '15:30',
+                        endTime: '17:15'
+                    },
+                    {
+                        id: '5',
+                        count: 5,
+                        label: '晚上',
+                        startTime: '18:30',
+                        endTime: '20:15'
+                    },
+                    {
+                        id: '6',
+                        count: 6,
+                        label: '晚上',
+                        startTime: '20:30',
+                        endTime: '22:15'
+                    }
+                ],
+                timeData: [
+                    {
+                        id: '1',
+                        label: '周一',
+                    },
+                    {
+                        id: '2',
+                        label: '周二',
+                        twoC: '计算机网络原理',
+                        twoR: '校本部三教212',
+                        fourC: '就业指导',
+                        fourR: '校本部四教407',
+                        fiveC: '单片机',
+                        fiveR: 'None'
+                    },
+                    {
+                        id: '3',
+                        label: '周三',
+                        fourC: '软件工程课程设计',
+                        fourR: '校本部三教305'
+                    },
+                    {
+                        id: '4',
+                        label: '周四',
+                        twoC: '计算机网络原理',
+                        twoR: '校本部三教212',
+                        threeC: '法语语言文化专题',
+                        threeR: '校本部四教310',
+                        fiveC: '单片机',
+                        fiveR: 'None'
+                    },
+                    {
+                        id: '5',
+                        label: '周五',
+                        oneC: '就业指导',
+                        oneR: '校本部四教407',
+                        fourC: '软件工程课程设计',
+                        fourR: '校本部三教305'
+                    },
+                    {
+                        id: '6',
+                        label: '周六',
+                    },
+                    {
+                        id: '7',
+                        label: '周日',
+                    }
+                ]
             }
         },
         mounted() {
-            this.init_info();
-            this.drawCharts();
+
         },
         created() {
             this.user = this.$storage.getBindUser();
+            this.role = this.$storage.getRole();
             this.init_date();
         },
         methods: {
             goback(){
-                this.$storage.saveUserInfo("null")
-                this.$router.push({name: 'login-page'})
+                this.$router.go(-1);
             },
 
             headerSelect(key, keyPath){
                 if(key === "1")console.log(key)
                 else console.log(key)
-            },
-
-            handleSelect(key, keyPath) {
-                let road = key.split('-')
-                let act = this.action_tree;
-                for(const i in road)act = act[road[i]]
-                console.log(act)
-                //this.$router.push({name: act})
-            },
-
-            init_info() {
-                this.info = this.$storage.getUserInfo();
-                if(this.info && JSON.stringify(this.info) !== "null") {
-                    this.init_info_table();
-                    return
-                }
-                request({
-                    uri: this.$storage.address() + 'info/student/' + this.user.user_id,
-                    method: 'GET',
-                    json: true
-                }).then(res => {
-                    this.info = res;
-                    this.info.gender = res.gender?'男':'女'
-                    this.$storage.saveUserInfo(this.info)
-                    this.init_info_table();
-                }).catch(err => {
-                    this.$message.error(err);
-                });
             },
 
             formatDate(date) {
@@ -178,7 +193,7 @@
                 const dayOfWeek = now.getDay();
                 this.fromDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1));
                 this.toDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7));
-            },
+            }
         }
     };
 </script>
@@ -215,6 +230,10 @@
 </style>
 
 <style type="text/css">
+    .tabletitle-timeline{
+        line-height: 18px!important;
+    }
+
     html,body,#app,.el-container{
         padding: 0;
         margin: 0;

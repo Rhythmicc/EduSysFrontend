@@ -231,12 +231,12 @@ export default {
             let act = this.action_tree;
             for(const i in road)act = act[road[i]]
             console.log(act)
-            //this.$router.push({name: act})
+            this.$router.push({name: act})
         },
 
         init_info() {
             this.info = this.$storage.getUserInfo();
-            if(this.info && JSON.stringify(this.info) !== "null") {
+            if(this.info && this.info !== "null") {
                 this.init_info_table();
                 return
             }
