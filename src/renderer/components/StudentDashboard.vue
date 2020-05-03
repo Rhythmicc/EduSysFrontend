@@ -231,7 +231,7 @@ export default {
             let act = this.action_tree;
             for(const i in road)act = act[road[i]]
             console.log(act)
-            this.$router.push({name: act})
+            //this.$router.push({name: act})
         },
 
         init_info() {
@@ -382,37 +382,6 @@ export default {
     }
 };
 </script>
-
-<style lang="scss">
-    @import "../style/params";
-
-    .layout {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-
-    .center {
-        align-items: center;
-        justify-content: center;
-        width: 60%;
-    }
-
-    .title {
-        width: 100%;
-        text-align: center;
-        padding: 10px;
-    }
-
-    .table {
-        width: 60%;
-    }
-
-    .buttons {
-        margin-top: 50px;
-    }
-</style>
 
 <style type="text/css">
     html,body,#app,.el-container{

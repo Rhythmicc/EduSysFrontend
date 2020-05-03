@@ -64,8 +64,8 @@ export default {
         submit() {
             this.info.gender = this.info.gender === 'male'
             request({
-                url: this.$storage.address() + '/info/alt' + (this.role === 0?"Student":this.role === 1?"Teacher": "Manager")
-                methods: 'POST',
+                url: this.$storage.address() + '/info/alt' + (this.role === 0?"Student":this.role === 1?"Teacher": "Manager"),
+                method: 'POST',
                 headers:{
                     'User-Agent': 'Request-Promise'
                 },

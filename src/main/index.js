@@ -46,7 +46,7 @@ function createMainWindow() {
   mainWindow = new BrowserWindow({
     height: 1000,
     width: 1500,
-    title: pkg.cnname,
+    title: pkg.cname,
     titleBarStyle: 'hidden',
     //frame: false,
     //icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
@@ -71,13 +71,6 @@ const registerIPC = function () {
   ipcMain.on('miniWindow', function (event, option) {
     mainWindow.setContentSize(option.width, option.height, true);
   });
-  ipcMain.on('register', function() {
-      mainWindow.loadURL(url.format({
-          pathname: path.join(__dirname, '#/RegisterPage'),
-          protocol: 'file',
-          slashes: true
-      }))
-  })
 }
 
 const getMenuData = function () {
@@ -134,51 +127,17 @@ const getMenuData = function () {
               {
                   label: 'wiki',
                   click() {
-                      shell.openExternal('https://github.com/willnewii/qiniuClient/wiki');
-                  }
-              },
-              {
-                  label: '提交异常或需求',
-                  click() {
-                      shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
+                      shell.openExternal('https://rhythmlian.cn');
                   }
               }
           ]
       }
   ];
 
-  let aboutMenu = {
-      label: '关于',
-      click() {
-          if (aboutWindow) {
-              aboutWindow.show();
-          } else {
-              let aboutWindow = new BrowserWindow({
-                  width: 300,
-                  height: 300,
-                  resizable: false,
-                  autoHideMenuBar: true,
-                  title: '关于',
-                  //icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
-                  webPreferences: {
-                      webSecurity: false,
-                      backgroundThrottling: false,
-                      nodeIntegration: true
-                  }
-              });
-              aboutWindow.loadURL(util.mainURL + '#/about');
-              aboutWindow.on('closed', () => {
-                  aboutWindow = null;
-              });
-          }
-      }
-  };
-
   if (process.platform === 'darwin') {
       template.unshift({
           label: app.getName(),
           submenu: [
-              aboutMenu,
               {type: 'separator'},
               {role: 'services', submenu: []},
               {type: 'separator'},
@@ -195,8 +154,6 @@ const getMenuData = function () {
           {role: 'minimize', label: '最小化'},
           {role: 'zoom', label: '缩放'},
       ];
-  } else {
-      template[template.length - 1].submenu.unshift(aboutMenu);
   }
   return template;
 };

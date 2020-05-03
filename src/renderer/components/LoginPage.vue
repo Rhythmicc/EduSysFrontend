@@ -2,32 +2,30 @@
     <el-container class="layout" style="-webkit-app-region: drag">
         <el-header class="center">
             <div style="-webkit-app-region: no-drag">
-                <h2 class="title">中国石油大学（北京）教务系统</h2>
-                <h3 class="title" style="color: #4394e9">登录</h3>
+                <h1 class="title">中国石油大学（北京）教务系统</h1>
+                <h2 class="title" style="color: #4394e9">登录</h2>
             </div>
         </el-header>
         <el-divider></el-divider>
-        <el-main class="center">
-            <el-tabs>
-                <el-tab-pane style="-webkit-app-region: no-drag">
-                    <el-form :model="formItem" :rules="ruleItem">
-                        <template>
-                            <el-form-item label="用户" prop="user_id">
-                                <el-input v-model="formItem.user_id" placeholder="用户 ID"/>
-                            </el-form-item>
-                            <br />
-                            <el-form-item label="密码" prop="password">
-                                <el-input v-model="formItem.password" type="password"/>
-                            </el-form-item>
-                        </template>
-                        <el-form-item>
-                            <div class="buttons layout">
-                                <el-button type="success" @click="handleSubmit()">登录</el-button>
-                                <el-button type="primary" @click="register()" style="margin-left: 8px">注册</el-button>
-                            </div>
-                        </el-form-item>
-                    </el-form>
-                </el-tab-pane>
+        <el-main class="center" style="-webkit-app-region: no-drag; align-content: center; width: 40%;">
+            <el-tabs style="margin-top: 20%;">
+            <el-form :model="formItem" :rules="ruleItem">
+                <template>
+                    <el-form-item label="用户" prop="user_id">
+                        <el-input v-model="formItem.user_id" placeholder="用户 ID"/>
+                    </el-form-item>
+                    <br />
+                    <el-form-item label="密码" prop="password">
+                        <el-input v-model="formItem.password" type="password"/>
+                    </el-form-item>
+                </template>
+                <el-form-item>
+                    <div class="buttons layout">
+                        <el-button type="success" @click="handleSubmit()">登录</el-button>
+                        <el-button type="primary" @click="register()" style="margin-left: 8px">注册</el-button>
+                    </div>
+                </el-form-item>
+            </el-form>
             </el-tabs>
         </el-main>
     </el-container>
@@ -71,6 +69,7 @@ export default {
                     });
                     setTimeout(() => {
                         this.$storage.saveRole(res.role)
+                        this.$storage.saveUserInfo("null")
                         if(res.role === 0){
                             this.$storage.saveUser(this.formItem, () => {
                                 this.$router.push({
@@ -111,7 +110,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss">
     @import "../style/params";
 
     .layout {
