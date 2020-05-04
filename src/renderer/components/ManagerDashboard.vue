@@ -7,12 +7,8 @@
             <el-col :span="8" style="width: 80%">
                 <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" style="float: right">
                     <el-submenu index="1">
-                        <template slot="title"><el-badge :value="12" :max="9" style="margin-top: 10px;">消息</el-badge></template>
+                        <template slot="title"><el-badge :value="12" :max="9" style="margin-top: 10px;">代办事项</el-badge></template>
                         <el-menu-item>1212</el-menu-item>
-                    </el-submenu>
-                    <el-submenu index=2>
-                        <template slot="title"><el-badge :value="3" :max="9" style="margin-top: 10px;">代办事项</el-badge></template>
-                        <el-menu-item>33</el-menu-item>
                     </el-submenu>
                 </el-menu>
             </el-col>
@@ -23,80 +19,20 @@
                     <el-submenu index="1">
                         <template slot="title">
                             <i class="el-icon-s-custom"></i>
-                            个人管理
+                            信息管理
                         </template>
                         <el-submenu index="1-1">
                             <template slot="title">学籍管理</template>
-                            <el-menu-item index="1-1-1">学生学籍信息</el-menu-item>
+                            <el-menu-item index="1-1-1">学生学籍管理</el-menu-item>
                             <el-menu-item index="1-1-2">个人信息修改</el-menu-item>
-                            <el-menu-item index="1-1-3">学籍异动</el-menu-item>
-                            <el-menu-item index="1-1-4">奖惩信息</el-menu-item>
-                            <el-menu-item index="1-1-5">电子注册</el-menu-item>
-                            <el-menu-item index="1-1-6">监护人信息采集</el-menu-item>
-                            <el-menu-item index="1-1-7">辅修方案</el-menu-item>
-                            <el-menu-item index="1-1-8">学生证信息维护</el-menu-item>
+                            <el-menu-item index="1-1-3">学籍异动管理</el-menu-item>
+                            <el-menu-item index="1-1-4">奖惩信息发布</el-menu-item>
+                            <el-menu-item index="1-1-5">电子注册管理</el-menu-item>
                         </el-submenu>
-                        <el-menu-item index="1-2">学生异动</el-menu-item>
-                        <el-submenu index="1-3">
-                            <template slot="title">毕业设计</template>
-                            <el-menu-item index="1-3-1">网上选题</el-menu-item>
-                            <el-menu-item index="1-3-2">论文提交</el-menu-item>
-                            <el-menu-item index="1-3-3">毕业设计成绩查询</el-menu-item>
-                            <el-menu-item index="1-3-4">优秀毕业设计名单</el-menu-item>
-                        </el-submenu>
+                        <el-menu-item index="1-2">学生异动登记</el-menu-item>
                     </el-submenu>
-                    <el-submenu index="2">
-                        <template slot="title">
-                            <i class="el-icon-s-claim"></i>
-                            课程管理
-                        </template>
-                        <el-submenu index="2-1">
-                            <template slot="title">课表</template>
-                            <el-menu-item index="2-1-1">本学期课表</el-menu-item>
-                            <el-menu-item index="2-1-2">历史课表</el-menu-item>
-                        </el-submenu>
-                        <el-submenu index="2-2">
-                            <template slot="title">选课管理</template>
-                            <el-menu-item index="2-2-1">特殊选课</el-menu-item>
-                            <el-menu-item index="2-2-2">普通选课</el-menu-item>
-                            <el-menu-item index="2-2-3">选课结果</el-menu-item>
-                            <el-menu-item index="2-2-4">退课申请</el-menu-item>
-                        </el-submenu>
-                    </el-submenu>
-                    <el-submenu index="3">
-                        <template slot="title">
-                            <i class="el-icon-star-on"></i>
-                            教学评估
-                        </template>
-                        <el-menu-item index="3-1">综合调查</el-menu-item>
-                        <el-menu-item index="3-2">教学评估</el-menu-item>
-                    </el-submenu>
-                    <el-submenu index="4">
-                        <template slot="title">
-                            <i class="el-icon-message-solid"></i>
-                            考务管理
-                        </template>
-                        <el-menu-item index="4-1">考试安排</el-menu-item>
-                        <el-menu-item index="4-2">考试成绩</el-menu-item>
-                    </el-submenu>
-                    <el-submenu index="5">
-                        <template slot="title">
-                            <i class="el-icon-search"></i>
-                            综合查询
-                        </template>
-                        <el-menu-item index="5-1">培养方案完成情况</el-menu-item>
-                        <el-menu-item index="5-2">指导计划完成情况</el-menu-item>
-                        <el-submenu index="5-3">
-                            <template slot="title">课程</template>
-                            <el-menu-item index="5-3-1">课程通知</el-menu-item>
-                            <el-menu-item index="5-3-2">课程属性</el-menu-item>
-                        </el-submenu>
-                        <el-submenu index="5-4">
-                            <template slot="title">教室</template>
-                            <el-menu-item index="5-4-1">空闲教室</el-menu-item>
-                            <el-menu-item index="5-4-2">预约教室</el-menu-item>
-                        </el-submenu>
-                    </el-submenu>
+                    <el-menu-item index="2"><i class="el-icon-s-claim"></i>特殊选课</el-menu-item>
+                    <el-menu-item index="3"><i class="el-icon-message-solid"></i>考务审批</el-menu-item>
                 </el-menu>
             </el-aside>
             <el-main height="100%">
@@ -115,20 +51,7 @@
                 </el-row>
                 <el-row style="-webkit-app-region: no-drag" :gutter="5">
                     <el-card :span="8" style="width: 100%" shadow="hover">
-                        <el-calendar :range="[fromDate, toDate]">
-                            <template slot="dateCell" slot-scope="{date, data}">
-                                <div>
-                                    <div>{{data.day.split('-')[2]}}</div>
-                                    <div v-for="item in calendarData" v-bind:key="item.things">
-                                        <div v-if="(item.days).indexOf(data.day.split('-')[2])!==-1">
-                                            <el-tooltip class="item" effect="dark" :content="item.things" placement="right" style="text-align: right; font-size: 12px">
-                                                <div>{{item.things}}</div>
-                                            </el-tooltip>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </el-calendar>
+                        TODO: develop
                     </el-card>
                 </el-row>
             </el-main>
@@ -146,12 +69,6 @@
                 activeIndex: '',
                 fromDate: '',
                 toDate: '',
-                calendarData: [
-                    {days: ['28', '30'], things: '计算机网络'},
-                    {days: ['30'], things: '法语文化专题'},
-                    {days: ['28', '30'], things: '单片机'},
-                    {days: ['29', '01'], things: '软件工程'}
-                ]
             }
         },
         mounted() {
@@ -202,15 +119,6 @@
                 }, {
                     key: '性别',
                     val: this.info.gender
-                }, {
-                    key: '学院',
-                    val: this.info.college,
-                }, {
-                    key: '专业',
-                    val: this.info.profession
-                }, {
-                    key: '年级',
-                    val: this.info.grade
                 }]
             },
 

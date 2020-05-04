@@ -120,7 +120,7 @@
                             <div>
                                 <div>{{data.day.split('-')[2]}}</div>
                                 <div v-for="item in calendarData" v-bind:key="item.things">
-                                    <div v-if="(item.days).indexOf(data.day.split('-')[2])!==-1">
+                                    <div v-if="(item.days).indexOf(getWeekDayFromDay(data.day))!==-1">
                                         <el-tooltip class="item" effect="dark" :content="item.things" placement="right" style="text-align: right; font-size: 12px">
                                             <div>{{item.things}}</div>
                                         </el-tooltip>
@@ -147,10 +147,10 @@ export default {
             fromDate: '',
             toDate: '',
             calendarData: [
-                {days: ['28', '30'], things: '计算机网络'},
-                {days: ['30'], things: '法语文化专题'},
-                {days: ['28', '30'], things: '单片机'},
-                {days: ['29', '01'], things: '软件工程'}
+                {days: ['2', '4'], things: '计算机网络'},
+                {days: ['4'], things: '法语文化专题'},
+                {days: ['2', '4'], things: '单片机'},
+                {days: ['3', '5'], things: '软件工程'}
             ],
             action_tree: {
                 '1': {
@@ -208,12 +208,12 @@ export default {
         }
     },
     mounted() {
-        this.init_info();
         this.drawCharts();
     },
     created() {
         this.user = this.$storage.getBindUser();
         this.init_date();
+        this.init_info();
     },
     methods: {
         goback(){
@@ -289,6 +289,12 @@ export default {
             const dayOfWeek = now.getDay();
             this.fromDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1));
             this.toDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7));
+        },
+
+        getWeekDayFromDay(date){
+            date = new Date(date)
+            const fromDate = new Date(this.fromDate);
+            return Math.ceil((date - fromDate) / 8.64e7).toString()
         },
 
         drawCharts() {
