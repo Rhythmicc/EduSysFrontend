@@ -85,16 +85,13 @@
                     <el-card :span="8" style="width: 100%" shadow="hover">
                         <el-calendar :range="[fromDate, toDate]">
                             <template slot="dateCell" slot-scope="{date, data}">
-                                <div>
-                                    <div>{{data.day.split('-')[2]}}</div>
-                                    <div v-for="item in calendarData" v-bind:key="item.things">
-                                        <div v-if="(item.days).indexOf(data.day.split('-')[2])!==-1">
-                                            <el-tooltip class="item" effect="dark" :content="item.things" placement="right" style="text-align: right; font-size: 12px">
-                                                <div>{{item.things}}</div>
-                                            </el-tooltip>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div>{{data.day.split('-')[2]}}</div>
+                                <el-tooltip class="item" effect="dark"
+                                            placement="right" style="text-align: right; font-size: 12px"
+                                            v-for="course in calendarData[getWeekDayFromDay(data.day)]" v-bind:key="course['course']"
+                                            :content="course['loc']">
+                                    <div>{{course['course']}}</div>
+                                </el-tooltip>
                             </template>
                         </el-calendar>
                     </el-card>
@@ -114,12 +111,8 @@
                 activeIndex: '',
                 fromDate: '',
                 toDate: '',
-                calendarData: [
-                    {days: ['28', '30'], things: '计算机网络'},
-                    {days: ['30'], things: '法语文化专题'},
-                    {days: ['28', '30'], things: '单片机'},
-                    {days: ['29', '01'], things: '软件工程'}
-                ]
+                calendarData: [],
+                tm_ls: ['8:00', '10:05', '13:30', '15:30', '18:30', '20:30']
             }
         },
         mounted() {
@@ -132,8 +125,9 @@
         },
         methods: {
             goback(){
-                this.$storage.saveUserInfo("null")
-                this.$router.push({name: 'login-page'})
+                this.$storage.saveUserInfo("null");
+                this.$storage.saveSessionObject('calendar', null);
+                this.$router.push({name: 'login-page'});
             },
 
             handleSelect(key, keyPath) {
@@ -158,6 +152,56 @@
                 }).catch(err => {
                     this.$message.error(err);
                 });
+            },
+
+            init_calendar() {
+                let calendar = this.$storage.getSessionObject("calendar")
+                if(calendar === JSON.parse("null")) {
+                    request({
+                        uri: this.$storage.address() + 'course/Teacher/Schedule/' + this.user.user_id,
+                        method: 'GET',
+                        json: true
+                    }).then(res => {
+                        this.$storage.saveSessionObject('calendar', res);
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
+                    calendar = this.$storage.getSessionObject("calendar")
+                }
+                this.calendarData = {}
+                for(let i=1;i<=7;++i) {
+                    let index = i.toString();
+                    this.calendarData[index] = []
+                    for (let j = 0; j < 7; ++j) this.calendarData[index].push({})
+                }
+                for(let i in calendar) {
+                    let time_ls = calendar[i][0].split(' ')
+                    let course_name = calendar[i][1]
+                    let loc_ls = calendar[i][2].split(' ')
+                    for(let j in time_ls) {
+                        time_ls[j] = time_ls[j].split(':')
+                        time_ls[j][0] = time_ls[j][0].split(',')
+                        time_ls[j][1] = time_ls[j][1].split('-')
+                    }
+                    let loc_ls_index = 0;
+                    for(let week_day in time_ls) {
+                        week_day = time_ls[week_day];
+                        let days = week_day[0];
+                        let cors = week_day[1];
+                        cors[0] = parseInt(cors[0]);
+                        for(let day in days) {
+                            this.calendarData[days[day]][cors[0]]['course'] = course_name;
+                            this.calendarData[days[day]][cors[0]]['loc'] = this.tm_ls[cors[0]-1] + '> ' + loc_ls[loc_ls_index];
+                            loc_ls_index = (loc_ls_index + 1) % loc_ls.length
+                        }
+                    }
+                }
+                for(let i=1;i<=7;++i) {
+                    let index = i.toString();
+                    let ls = this.calendarData[index];
+                    this.calendarData[index] = []
+                    for(let j in ls)if(ls[j]['course'])this.calendarData[index].push(ls[j])
+                }
             },
 
             init_info_table() {
@@ -195,6 +239,12 @@
                 const dayOfWeek = now.getDay();
                 this.fromDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1));
                 this.toDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7));
+            },
+
+            getWeekDayFromDay(date){
+                date = new Date(date)
+                const fromDate = new Date(this.fromDate);
+                return Math.ceil((date - fromDate) / 8.64e7).toString()
             },
 
             drawCharts() {

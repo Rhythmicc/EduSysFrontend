@@ -98,7 +98,7 @@ export default new Router({
     {
       path: '/CurCourseTable',
       name: 'CurCourseTable',
-      component: require('@/StudentAction/CurCourseTable').default
+      component: require('@/Public/CurCourseTable').default
     },
     {
       path: '/HisCourseTable',

@@ -50,7 +50,7 @@ export default {
     created() {
         this.info = this.$storage.getUserInfo()
         this.info.gender = this.info.gender === '男'?'male': 'female'
-        this.role = this.$storage.getRole()
+        this.role = this.$storage.getSessionObject('role')
     },
     methods: {
         goback() {

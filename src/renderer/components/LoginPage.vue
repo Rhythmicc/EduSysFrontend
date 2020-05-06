@@ -68,8 +68,9 @@ export default {
                         type: 'success'
                     });
                     setTimeout(() => {
-                        this.$storage.saveRole(res.role)
+                        this.$storage.saveSessionObject("role", res.role)
                         this.$storage.saveUserInfo("null")
+                        this.$storage.saveSessionObject('calendar', null)
                         if(res.role === 0){
                             this.$storage.saveUser(this.formItem, () => {
                                 this.$router.push({

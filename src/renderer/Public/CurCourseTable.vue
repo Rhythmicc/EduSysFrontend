@@ -68,7 +68,8 @@
                 fromDate: '',
                 toDate: '',
                 courseKey:['oneC','twoC','threeC','fourC','fiveC','sixC'],//科目key值
-                roomKey:['oneR','twoR','threeR','fourR','fiveR','sixR'],//老师key值
+                roomKey: ['oneR','twoR','threeR','fourR','fiveR','sixR'],//老师key值
+                week_day_name: '一二三四五六七',
                 titleData:[
                     {
                         id:'1',
@@ -113,67 +114,20 @@
                         endTime: '22:15'
                     }
                 ],
-                timeData: [
-                    {
-                        id: '1',
-                        label: '周一',
-                    },
-                    {
-                        id: '2',
-                        label: '周二',
-                        twoC: '计算机网络原理',
-                        twoR: '校本部三教212',
-                        fourC: '就业指导',
-                        fourR: '校本部四教407',
-                        fiveC: '单片机',
-                        fiveR: 'None'
-                    },
-                    {
-                        id: '3',
-                        label: '周三',
-                        fourC: '软件工程课程设计',
-                        fourR: '校本部三教305'
-                    },
-                    {
-                        id: '4',
-                        label: '周四',
-                        twoC: '计算机网络原理',
-                        twoR: '校本部三教212',
-                        threeC: '法语语言文化专题',
-                        threeR: '校本部四教310',
-                        fiveC: '单片机',
-                        fiveR: 'None'
-                    },
-                    {
-                        id: '5',
-                        label: '周五',
-                        oneC: '就业指导',
-                        oneR: '校本部四教407',
-                        fourC: '软件工程课程设计',
-                        fourR: '校本部三教305'
-                    },
-                    {
-                        id: '6',
-                        label: '周六',
-                    },
-                    {
-                        id: '7',
-                        label: '周日',
-                    }
-                ]
+                timeData: []
             }
         },
         mounted() {
-
+            this.init_table()
         },
         created() {
             this.user = this.$storage.getBindUser();
-            this.role = this.$storage.getRole();
+            this.role = this.$storage.getSessionObject('role');
             this.init_date();
         },
         methods: {
             goback(){
-                this.$router.go(-1);
+                this.$router.push({name: this.role===0?'student-dashboard': 'teacher-dashboard'});
             },
 
             headerSelect(key, keyPath){
@@ -186,6 +140,59 @@
                 const m = date.getMonth() + 1;
                 const d = date.getDate();
                 return y + '-' + m + '-' + d;
+            },
+
+            init_table(depth) {
+                if(depth > 5){
+                    this.$message.error('Max Tried Limited!')
+                    return
+                }
+                let ls = this.$storage.getSessionObject('CourseInfos')
+                if(ls === null) {
+                    request({
+                        uri: this.$storage.address() + 'course/' + (this.role===0?'Student':'Teacher') + '/Courses/' + this.$storage.getBindUser().user_id,
+                        method: 'GET',
+                        json: true
+                    }).then(res => {
+                        this.$storage.saveSessionObject('CourseInfos', res)
+                        this.init_table(depth + 1)
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
+                }
+                this.timeData = []
+                for(let i=1;i<=7;++i)this.timeData.push({id: i.toString(), label: '周' + this.week_day_name[i-1]})
+                for(let i in ls) {
+                    let time_ls = ls[i].time_ls.split(' ')
+                    let course_name = ls[i].name
+                    let loc_ls = ls[i].loc_ls.split(' ')
+                    for(let j in time_ls) {
+                        time_ls[j] = time_ls[j].split(':')
+                        time_ls[j][0] = time_ls[j][0].split(',')
+                        time_ls[j][1] = time_ls[j][1].split('-')
+                    }
+                    let loc_ls_index = 0;
+                    for(let week_day in time_ls) {
+                        week_day = time_ls[week_day];
+                        let days = week_day[0];
+                        let cors = week_day[1];
+                        for(let day in days)days[day] = parseInt(days[day]);
+                        for(let cor in cors)cors[cor] = parseInt(cors[cor]);
+                        for(let day in days) {
+                            if(cors.length > 1)
+                                for(let l = cors[0]; l < cors[1]; ++l) {
+                                    this.timeData[days[day] - 1][this.courseKey[l-1]] = course_name;
+                                    this.timeData[days[day] - 1][this.roomKey[l-1]] = loc_ls[loc_ls_index];
+                                    loc_ls_index = (loc_ls_index + 1) % loc_ls.length
+                                }
+                            else {
+                                this.timeData[days[day] - 1][this.courseKey[cors[0]-1]] = course_name;
+                                this.timeData[days[day] - 1][this.roomKey[cors[0]-1]] = loc_ls[loc_ls_index];
+                                loc_ls_index = (loc_ls_index + 1) % loc_ls.length
+                            }
+                        }
+                    }
+                }
             },
 
             init_date() {
