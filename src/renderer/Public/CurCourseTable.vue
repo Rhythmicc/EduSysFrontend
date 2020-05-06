@@ -18,12 +18,12 @@
             </el-col>
         </el-header>
         <el-container style="height: 100%">
-            <el-table :data="timeData" style="width: 80%; margin-top: 10%" align="center">
+            <el-table :data="timeData" style="width: 80%;" align="center">
                 <el-table-column label="周" fixed="left" prop="label" align="center"></el-table-column>
                 <el-table-column label="上午" align="center">
                     <el-table-column
                             v-for="(v, i) in titleData" :key="i"
-                            v-if="v.label === '上午'" align="center">
+                            v-if="v.label === '上午'" align="left">
                         <template slot="header" slot-scope="scope">
                             <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
                         </template>
@@ -35,7 +35,7 @@
                 <el-table-column label="下午" align="center">
                     <el-table-column
                             v-for="(v, i) in titleData" :key="i"
-                            v-if="v.label === '下午'" align="center">
+                            v-if="v.label === '下午'" align="left">
                         <template slot="header" slot-scope="scope">
                             <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
                         </template>
@@ -47,7 +47,7 @@
                 <el-table-column label="晚上" align="center">
                     <el-table-column
                             v-for="(v, i) in titleData" :key="i"
-                            v-if="v.label === '晚上'" align="center">
+                            v-if="v.label === '晚上'" align="left">
                         <template slot="header" slot-scope="scope">
                             <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
                         </template>
@@ -181,13 +181,23 @@
                         for(let day in days) {
                             if(cors.length > 1)
                                 for(let l = cors[0]; l < cors[1]; ++l) {
-                                    this.timeData[days[day] - 1][this.courseKey[l-1]] = course_name;
-                                    this.timeData[days[day] - 1][this.roomKey[l-1]] = loc_ls[loc_ls_index];
+                                    if(!this.timeData[days[day] - 1][this.courseKey[l-1]]) {
+                                        this.timeData[days[day] - 1][this.courseKey[l - 1]] = '课程：' + course_name;
+                                        this.timeData[days[day] - 1][this.roomKey[l - 1]] = '地点：' + loc_ls[loc_ls_index];
+                                    } else {
+                                        this.timeData[days[day] - 1][this.courseKey[l - 1]] += '、' + course_name;
+                                        this.timeData[days[day] - 1][this.roomKey[l - 1]] += '、' + loc_ls[loc_ls_index];
+                                    }
                                     loc_ls_index = (loc_ls_index + 1) % loc_ls.length
                                 }
                             else {
-                                this.timeData[days[day] - 1][this.courseKey[cors[0]-1]] = course_name;
-                                this.timeData[days[day] - 1][this.roomKey[cors[0]-1]] = loc_ls[loc_ls_index];
+                                if(!this.timeData[days[day] - 1][this.courseKey[cors[0]-1]]) {
+                                    this.timeData[days[day] - 1][this.courseKey[cors[0] - 1]] = '课程：' + course_name;
+                                    this.timeData[days[day] - 1][this.roomKey[cors[0] - 1]] = '地点：' + loc_ls[loc_ls_index];
+                                } else {
+                                    this.timeData[days[day] - 1][this.courseKey[cors[0] - 1]] += '、' + course_name;
+                                    this.timeData[days[day] - 1][this.roomKey[cors[0] - 1]] += '、' + loc_ls[loc_ls_index];
+                                }
                                 loc_ls_index = (loc_ls_index + 1) % loc_ls.length
                             }
                         }
