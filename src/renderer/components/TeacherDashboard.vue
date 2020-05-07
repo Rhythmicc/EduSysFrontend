@@ -116,27 +116,91 @@
             }
         },
         mounted() {
-            this.init_info();
+            this.init_calendar(0);
             this.drawCharts();
         },
         created() {
             this.user = this.$storage.getBindUser();
             this.init_date();
+            this.init_info();
         },
         methods: {
             goback(){
-                this.$storage.saveUserInfo("null");
-                this.$storage.saveSessionObject('calendar', null);
-                this.$router.push({name: 'login-page'});
+                this.$storage.saveUserInfo("null")
+                this.$storage.saveSessionObject('calendar', null)
+                this.$router.push({name: 'login-page'})
+            },
+
+            headerSelect(key, keyPath){
+                if(key === "1")console.log(key)
+                else console.log(key)
+            },
+
+            init_calendar(depth) {
+                if(depth > 5){
+                    this.$message.error('Max Tried Limited!')
+                    return
+                }
+                let calendar = this.$storage.getSessionObject("calendar")
+                if(calendar === null) {
+                    request({
+                        uri: this.$storage.address() + 'course/Teacher/Schedule/' + this.user.user_id,
+                        method: 'GET',
+                        json: true
+                    }).then(res => {
+                        this.$storage.saveSessionObject('calendar', res);
+                        this.init_calendar(depth + 1)
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
+                }
+                this.calendarData = {}
+                for(let i=1;i<=7;++i) {
+                    let index = i.toString();
+                    this.calendarData[index] = []
+                    for (let j = 0; j < 7; ++j) this.calendarData[index].push({})
+                }
+                for(let i in calendar) {
+                    let time_ls = calendar[i][0].split(' ')
+                    let course_name = calendar[i][1]
+                    let loc_ls = calendar[i][2].split(' ')
+                    for(let j in time_ls){
+                        time_ls[j] = time_ls[j].split(':')
+                        time_ls[j][0] = time_ls[j][0].split(',')
+                        time_ls[j][1] = time_ls[j][1].split('-')
+                    }
+                    let loc_ls_index = 0;
+                    for(let week_day in time_ls) {
+                        week_day = time_ls[week_day];
+                        let days = week_day[0];
+                        let cors = week_day[1];
+                        cors[0] = parseInt(cors[0]);
+                        for(let day in days){
+                            this.calendarData[days[day]][cors[0]]['course'] = course_name;
+                            this.calendarData[days[day]][cors[0]]['loc'] = this.tm_ls[cors[0]-1] + '> ' + loc_ls[loc_ls_index];
+                            loc_ls_index = (loc_ls_index + 1) % loc_ls.length
+                        }
+                    }
+                }
+                for(let i=1;i<=7;++i){
+                    let index = i.toString();
+                    let ls = this.calendarData[index];
+                    this.calendarData[index] = []
+                    for(let j in ls)if(ls[j]['course'])this.calendarData[index].push(ls[j])
+                }
             },
 
             handleSelect(key, keyPath) {
-                console.log(key, keyPath);
+                let road = key.split('-')
+                let act = this.action_tree;
+                for(const i in road)act = act[road[i]]
+                if(act === 'ChangeInfo') this.$storage.saveSessionObject('role', 0);
+                this.$router.push({name: act})
             },
 
             init_info() {
                 this.info = this.$storage.getUserInfo();
-                if(this.info && JSON.stringify(this.info) !== "null") {
+                if(this.info) {
                     this.init_info_table();
                     return
                 }
@@ -152,56 +216,6 @@
                 }).catch(err => {
                     this.$message.error(err);
                 });
-            },
-
-            init_calendar() {
-                let calendar = this.$storage.getSessionObject("calendar")
-                if(calendar === JSON.parse("null")) {
-                    request({
-                        uri: this.$storage.address() + 'course/Teacher/Schedule/' + this.user.user_id,
-                        method: 'GET',
-                        json: true
-                    }).then(res => {
-                        this.$storage.saveSessionObject('calendar', res);
-                    }).catch(error => {
-                        this.$message.error(error)
-                    })
-                    calendar = this.$storage.getSessionObject("calendar")
-                }
-                this.calendarData = {}
-                for(let i=1;i<=7;++i) {
-                    let index = i.toString();
-                    this.calendarData[index] = []
-                    for (let j = 0; j < 7; ++j) this.calendarData[index].push({})
-                }
-                for(let i in calendar) {
-                    let time_ls = calendar[i][0].split(' ')
-                    let course_name = calendar[i][1]
-                    let loc_ls = calendar[i][2].split(' ')
-                    for(let j in time_ls) {
-                        time_ls[j] = time_ls[j].split(':')
-                        time_ls[j][0] = time_ls[j][0].split(',')
-                        time_ls[j][1] = time_ls[j][1].split('-')
-                    }
-                    let loc_ls_index = 0;
-                    for(let week_day in time_ls) {
-                        week_day = time_ls[week_day];
-                        let days = week_day[0];
-                        let cors = week_day[1];
-                        cors[0] = parseInt(cors[0]);
-                        for(let day in days) {
-                            this.calendarData[days[day]][cors[0]]['course'] = course_name;
-                            this.calendarData[days[day]][cors[0]]['loc'] = this.tm_ls[cors[0]-1] + '> ' + loc_ls[loc_ls_index];
-                            loc_ls_index = (loc_ls_index + 1) % loc_ls.length
-                        }
-                    }
-                }
-                for(let i=1;i<=7;++i) {
-                    let index = i.toString();
-                    let ls = this.calendarData[index];
-                    this.calendarData[index] = []
-                    for(let j in ls)if(ls[j]['course'])this.calendarData[index].push(ls[j])
-                }
             },
 
             init_info_table() {

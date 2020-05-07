@@ -286,7 +286,7 @@ export default {
 
         init_info() {
             this.info = this.$storage.getUserInfo();
-            if(this.info && this.info !== "null") {
+            if(this.info) {
                 this.init_info_table();
                 return
             }

@@ -17,47 +17,66 @@
                 </el-menu>
             </el-col>
         </el-header>
-        <el-container style="height: 100%">
-            <el-table :data="timeData" style="width: 80%;" align="center">
-                <el-table-column label="周" fixed="left" prop="label" align="center"></el-table-column>
-                <el-table-column label="上午" align="center">
-                    <el-table-column
-                            v-for="(v, i) in titleData" :key="i"
-                            v-if="v.label === '上午'" align="left">
-                        <template slot="header" slot-scope="scope">
-                            <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
-                        </template>
-                        <template slot-scope="scope">
-                            <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
-                        </template>
-                    </el-table-column>
-                </el-table-column>
-                <el-table-column label="下午" align="center">
-                    <el-table-column
-                            v-for="(v, i) in titleData" :key="i"
-                            v-if="v.label === '下午'" align="left">
-                        <template slot="header" slot-scope="scope">
-                            <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
-                        </template>
-                        <template slot-scope="scope">
-                            <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
-                        </template>
-                    </el-table-column>
-                </el-table-column>
-                <el-table-column label="晚上" align="center">
-                    <el-table-column
-                            v-for="(v, i) in titleData" :key="i"
-                            v-if="v.label === '晚上'" align="left">
-                        <template slot="header" slot-scope="scope">
-                            <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
-                        </template>
-                        <template slot-scope="scope">
-                            <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
-                        </template>
-                    </el-table-column>
-                </el-table-column>
-            </el-table>
-        </el-container>
+        <el-main style="height: 100%; -webkit-app-region: no-drag;">
+            <h1 style="text-align: center">课程表</h1>
+            <el-row style="width: 100%">
+                <el-col>
+                    <el-table :data="timeData" style="width: 100%;" align="center">
+                        <el-table-column label="周" fixed="left" prop="label" align="center"></el-table-column>
+                        <el-table-column label="上午" align="center">
+                            <el-table-column
+                                    v-for="(v, i) in titleData" :key="i"
+                                    v-if="v.label === '上午'" align="left">
+                                <template slot="header" slot-scope="scope">
+                                    <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
+                                </template>
+                                <template slot-scope="scope">
+                                    <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
+                                </template>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column label="下午" align="center">
+                            <el-table-column
+                                    v-for="(v, i) in titleData" :key="i"
+                                    v-if="v.label === '下午'" align="left">
+                                <template slot="header" slot-scope="scope">
+                                    <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
+                                </template>
+                                <template slot-scope="scope">
+                                    <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
+                                </template>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column label="晚上" align="center">
+                            <el-table-column
+                                    v-for="(v, i) in titleData" :key="i"
+                                    v-if="v.label === '晚上'" align="left">
+                                <template slot="header" slot-scope="scope">
+                                    <div class="tabletitle-timeline">第{{v.count}}节<br />{{v.startTime}}-{{v.endTime}}</div>
+                                </template>
+                                <template slot-scope="scope">
+                                    <div>{{scope.row[courseKey[i]]}}<br />{{scope.row[roomKey[i]]}}</div>
+                                </template>
+                            </el-table-column>
+                        </el-table-column>
+                    </el-table>
+                </el-col>
+            </el-row>
+            <h2 style="text-align: center;">详细课程信息</h2>
+            <el-row style="width: 100%;">
+                <el-col>
+                    <el-table :data="course_ls" align="center">
+                        <el-table-column label="ID" prop="course_id"></el-table-column>
+                        <el-table-column label="课程" prop="name"></el-table-column>
+                        <el-table-column label="学分" prop="score"></el-table-column>
+                        <el-table-column label="起始（周）" prop="start_week"></el-table-column>
+                        <el-table-column label="周数" prop="weeks"></el-table-column>
+                        <el-table-column label="时间" prop="time_ls"></el-table-column>
+                        <el-table-column label="地点" prop="loc_ls"></el-table-column>
+                    </el-table>
+                </el-col>
+            </el-row>
+        </el-main>
     </el-container>
 </template>
 <script>
@@ -70,6 +89,7 @@
                 courseKey:['oneC','twoC','threeC','fourC','fiveC','sixC'],//科目key值
                 roomKey: ['oneR','twoR','threeR','fourR','fiveR','sixR'],//老师key值
                 week_day_name: '一二三四五六七',
+                course_ls: [],
                 titleData:[
                     {
                         id:'1',
@@ -142,30 +162,31 @@
                 return y + '-' + m + '-' + d;
             },
 
-            init_table(depth) {
+            init_table(depth=0) {
                 if(depth > 5){
                     this.$message.error('Max Tried Limited!')
                     return
                 }
-                let ls = this.$storage.getSessionObject('CourseInfos')
-                if(ls === null) {
+                this.course_ls = this.$storage.getSessionObject('CourseInfos')
+                if(this.course_ls === null) {
                     request({
                         uri: this.$storage.address() + 'course/' + (this.role===0?'Student':'Teacher') + '/Courses/' + this.$storage.getBindUser().user_id,
                         method: 'GET',
                         json: true
                     }).then(res => {
                         this.$storage.saveSessionObject('CourseInfos', res)
-                        this.init_table(depth + 1)
+                        this.course_ls = res;
+                        //this.init_table(depth + 1)
                     }).catch(error => {
                         this.$message.error(error)
                     })
                 }
                 this.timeData = []
                 for(let i=1;i<=7;++i)this.timeData.push({id: i.toString(), label: '周' + this.week_day_name[i-1]})
-                for(let i in ls) {
-                    let time_ls = ls[i].time_ls.split(' ')
-                    let course_name = ls[i].name
-                    let loc_ls = ls[i].loc_ls.split(' ')
+                for(let i in this.course_ls) {
+                    let time_ls = this.course_ls[i].time_ls.split(' ')
+                    let course_name = this.course_ls[i].name
+                    let loc_ls = this.course_ls[i].loc_ls.split(' ')
                     for(let j in time_ls) {
                         time_ls[j] = time_ls[j].split(':')
                         time_ls[j][0] = time_ls[j][0].split(',')
@@ -180,7 +201,7 @@
                         for(let cor in cors)cors[cor] = parseInt(cors[cor]);
                         for(let day in days) {
                             if(cors.length > 1)
-                                for(let l = cors[0]; l < cors[1]; ++l) {
+                                for(let l = cors[0]; l <= cors[1]; ++l) {
                                     if(!this.timeData[days[day] - 1][this.courseKey[l-1]]) {
                                         this.timeData[days[day] - 1][this.courseKey[l - 1]] = '课程：' + course_name;
                                         this.timeData[days[day] - 1][this.roomKey[l - 1]] = '地点：' + loc_ls[loc_ls_index];

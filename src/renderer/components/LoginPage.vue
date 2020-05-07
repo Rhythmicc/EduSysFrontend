@@ -69,7 +69,7 @@ export default {
                     });
                     setTimeout(() => {
                         this.$storage.saveSessionObject("role", res.role)
-                        this.$storage.saveUserInfo("null")
+                        this.$storage.saveUserInfo(null)
                         this.$storage.saveSessionObject('calendar', null)
                         if(res.role === 0){
                             this.$storage.saveUser(this.formItem, () => {
@@ -96,7 +96,7 @@ export default {
                                 })
                             });
                     }}, 1000);
-                } else this.$message.error("登录失败！");
+                } else this.$message.error("登录失败！" + res.msg);
             })
         },
 
