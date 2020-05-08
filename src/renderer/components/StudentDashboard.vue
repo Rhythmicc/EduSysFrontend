@@ -197,7 +197,8 @@ export default {
                         "2": "OrderClassroom"
                     }
                 }
-            }
+            },
+            elective_flag: false
         }
     },
     mounted() {

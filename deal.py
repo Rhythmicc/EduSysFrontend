@@ -7,7 +7,7 @@ ss = \
 {
     path: '/%s',
     name: '%s',
-    component: require('@/StudentAction/%s').default
+    component: require('@/ManagerAction/%s').default
 },
 """ % (file_name, file_name, file_name)
 pyperclip.copy(ss)

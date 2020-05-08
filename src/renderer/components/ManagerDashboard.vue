@@ -2,7 +2,7 @@
     <el-container style="-webkit-app-region: drag" direction="vertical">
         <el-header style="font-size: 12px; -webkit-app-region: drag; border: 2px;">
             <el-col :span="8" style="width: 20%">
-                <el-page-header content="学生主页" style="margin-top: 27px" @back="goback"></el-page-header>
+                <el-page-header content="管理员主页" style="margin-top: 27px" @back="goback"></el-page-header>
             </el-col>
             <el-col :span="8" style="width: 80%">
                 <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" style="float: right">
@@ -21,15 +21,11 @@
                             <i class="el-icon-s-custom"></i>
                             信息管理
                         </template>
-                        <el-submenu index="1-1">
-                            <template slot="title">学籍管理</template>
-                            <el-menu-item index="1-1-1">学生学籍管理</el-menu-item>
-                            <el-menu-item index="1-1-2">个人信息修改</el-menu-item>
-                            <el-menu-item index="1-1-3">学籍异动管理</el-menu-item>
-                            <el-menu-item index="1-1-4">奖惩信息发布</el-menu-item>
-                            <el-menu-item index="1-1-5">电子注册管理</el-menu-item>
-                        </el-submenu>
-                        <el-menu-item index="1-2">学生异动登记</el-menu-item>
+                        <el-menu-item index="1-1">学籍管理</el-menu-item>
+                        <el-menu-item index="1-2">个人信息</el-menu-item>
+                        <el-menu-item index="1-3">学籍异动</el-menu-item>
+                        <el-menu-item index="1-4">奖惩信息</el-menu-item>
+                        <el-menu-item index="1-5">电子注册</el-menu-item>
                     </el-submenu>
                     <el-menu-item index="2"><i class="el-icon-s-claim"></i>特殊选课</el-menu-item>
                     <el-menu-item index="3"><i class="el-icon-message-solid"></i>考务审批</el-menu-item>
@@ -45,7 +41,11 @@
                     </el-col>
                     <el-col style="width: 50%">
                         <el-card shadow="hover">
-                            <div id="CPLchart" style="width: 100%; height: 303px;"></div>
+                            <el-switch
+                                    v-model="elective_flag"
+                                    active-text="开启选课"
+                                    inactive-text="关闭选课" @change="elective">
+                            </el-switch>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -60,7 +60,6 @@
 </template>
 <script>
     import request from 'request-promise'
-    import echarts from 'echarts'
     export default {
         data() {
             return {
@@ -69,6 +68,18 @@
                 activeIndex: '',
                 fromDate: '',
                 toDate: '',
+                elective_flag: '关闭选课',
+                action_tree: {
+                    "1": {
+                        "1": "StudentInfoManage",
+                        "2": "ChangeInfo",
+                        "3": "StudentMoveManage",
+                        "4": "RewardInfoUpload",
+                        "5": "EleRegisterManage"
+                    },
+                    "2": "SpecialElective",
+                    "3": "ExamApprove"
+                }
             }
         },
         mounted() {
@@ -85,7 +96,11 @@
             },
 
             handleSelect(key, keyPath) {
-                console.log(key, keyPath);
+                let road = key.split('-')
+                let act = this.action_tree;
+                for(const i in road)act = act[road[i]]
+                if(act === 'ChangeInfo') this.$storage.saveSessionObject('role', 0);
+                this.$router.push({name: act})
             },
 
             init_info() {
@@ -136,93 +151,27 @@
                 this.toDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7));
             },
 
-            drawCharts() {
-                let chart = echarts.init(document.getElementById('CPLchart'))
-                const option = {
-                    title: {
-                        text: '保有储量变化图',
-                        subtext: '一次能源'
-                    },
-                    tooltip: {
-                        trigger: 'axis'
-                    },
-                    legend: {
-                        data: ['煤', '石油', '天然气']
-                    },
-                    toolbox: {
-                        show: true,
-                        feature: {
-                            dataView: {show: true, readOnly: false},
-                            magicType: {show: true, type: ['line', 'bar']},
-                            restore: {show: true},
-                            saveAsImage: {show: true}
-                        }
-                    },
-                    calculable: true,
-                    xAxis: [
-                        {
-                            type: 'category',
-                            data: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017'],
-                            splitNumber: 10
-                        }
-                    ],
-                    yAxis: [
-                        {
-                            type: 'value'
-                        }
-                    ],
-                    series: [
-                        {
-                            name: '煤',
-                            type: 'bar',
-                            data: [1683.47, 1654.23, 1640.12, 1641.6, 1639.68, 1642.7, 1610.41, 1639.45, 1722.2],
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
-                            },
-                            markLine: {
-                                data: [
-                                    {type: 'average', name: '平均值'}
-                                ]
-                            }
-                        },
-                        {
-                            name: '石油',
-                            type: 'bar',
-                            data: [22490.2, 24947.67, 29844.34, 31397.94, 33713, 36300.8, 38445.3, 38375.6, 38158.7],
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
-                            },
-                            markLine: {
-                                data: [
-                                    {type: 'average', name: '平均值'}
-                                ]
-                            }
-                        },
-                        {
-                            name: '天然气',
-                            type: 'bar',
-                            data: [5502.54, 5628.11, 5478, 6376.26, 6231.14, 8047.88, 7857.1, 7802.5, 8695.01],
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
-                            },
-                            markLine: {
-                                data: [
-                                    {type: 'average', name: '平均值'}
-                                ]
-                            }
-                        }
-                    ]
-                };
-                chart.setOption(option);
+            elective() {
+                if(this.elective_flag === '开启选课')request({
+                    uri: this.$storage.address() + 'activity/EnableActivity/elective',
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.$message({
+                        message: res.status?'开启成功': '开启失败',
+                        type: res.status?'success': 'error'
+                    })
+                }).catch(error => {this.$message.error('Request Failed')});
+                else request({
+                    uri: this.$storage.address() + 'activity/DisableActivity/elective',
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.$message({
+                        message: res.status?'关闭成功': '关闭失败',
+                        type: res.status?'success': 'error'
+                    })
+                }).catch(error => {this.$message.error('Request Failed')});
             }
         }
     };

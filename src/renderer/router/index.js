@@ -103,7 +103,7 @@ export default new Router({
     {
       path: '/HisCourseTable',
       name: 'HisCourseTable',
-      component: require('@/StudentAction/HisCourseTable').default
+      component: require('@/Public/HisCourseTable').default
     },
     {
       path: '/SpecialChooseCourse',
@@ -158,22 +158,72 @@ export default new Router({
     {
       path: '/CourseAlert',
       name: 'CourseAlert',
-      component: require('@/StudentAction/CourseAlert').default
+      component: require('@/Public/CourseAlert').default
     },
     {
       path: '/CoursesInfo',
       name: 'CoursesInfo',
-      component: require('@/StudentAction/CoursesInfo').default
+      component: require('@/Public/CoursesInfo').default
     },
     {
       path: '/FreeClassroom',
       name: 'FreeClassroom',
-      component: require('@/StudentAction/FreeClassroom').default
+      component: require('@/Public/FreeClassroom').default
     },
     {
       path: '/OrderClassroom',
       name: 'OrderClassroom',
-      component: require('@/StudentAction/OrderClassroom').default
+      component: require('@/Public/OrderClassroom').default
+    },
+    {
+      path: '/CoursesManage',
+      name: 'CoursesManage',
+      component: require('@/TeacherAction/CoursesManage').default
+    },
+    {
+      path: '/EvaluateResult',
+      name: 'EvaluateResult',
+      component: require('@/TeacherAction/EvaluateResult').default
+    },
+    {
+      path: '/ApplyExam',
+      name: 'ApplyExam',
+      component: require('@/TeacherAction/ApplyExam').default
+    },
+    {
+      path: '/UploadGrade',
+      name: 'UploadGrade',
+      component: require('@/TeacherAction/UploadGrade').default
+    },
+    {
+      path: '/StudentInfoManage',
+      name: 'StudentInfoManage',
+      component: require('@/ManagerAction/StudentInfoManage').default
+    },
+    {
+      path: '/StudentMoveManage',
+      name: 'StudentMoveManage',
+      component: require('@/ManagerAction/StudentMoveManage').default
+    },
+    {
+      path: '/RewardInfoUpload',
+      name: 'RewardInfoUpload',
+      component: require('@/ManagerAction/RewardInfoUpload').default
+    },
+    {
+      path: '/EleRegisterManage',
+      name: 'EleRegisterManage',
+      component: require('@/ManagerAction/EleRegisterManage').default
+    },
+    {
+      path: '/SpecialElective',
+      name: 'SpecialElective',
+      component: require('@/ManagerAction/SpecialElective').default
+    },
+    {
+      path: '/ExamApprove',
+      name: 'ExamApprove',
+      component: require('@/ManagerAction/ExamApprove').default
     },
     {
       path: '*',

@@ -38,8 +38,7 @@
                             <i class="el-icon-star-on"></i>
                             教学评估
                         </template>
-                        <el-menu-item index="3-1">综合调查</el-menu-item>
-                        <el-menu-item index="3-2">评估结果</el-menu-item>
+                        <el-menu-item index="3-1">评估结果</el-menu-item>
                     </el-submenu>
                     <el-submenu index="4">
                         <template slot="title">
@@ -56,13 +55,13 @@
                         </template>
                         <el-submenu index="5-1">
                             <template slot="title">课程</template>
-                            <el-menu-item index="5-3-1">课程通知</el-menu-item>
-                            <el-menu-item index="5-3-2">课程属性</el-menu-item>
+                            <el-menu-item index="5-1-1">课程通知</el-menu-item>
+                            <el-menu-item index="5-1-2">课程属性</el-menu-item>
                         </el-submenu>
                         <el-submenu index="5-2">
                             <template slot="title">教室</template>
-                            <el-menu-item index="5-4-1">空闲教室</el-menu-item>
-                            <el-menu-item index="5-4-2">预约教室</el-menu-item>
+                            <el-menu-item index="5-2-1">空闲教室</el-menu-item>
+                            <el-menu-item index="5-2-2">预约教室</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                 </el-menu>
@@ -112,7 +111,34 @@
                 fromDate: '',
                 toDate: '',
                 calendarData: [],
-                tm_ls: ['8:00', '10:05', '13:30', '15:30', '18:30', '20:30']
+                tm_ls: ['8:00', '10:05', '13:30', '15:30', '18:30', '20:30'],
+                action_tree: {
+                    "1": "ChangeInfo",
+                    "2": {
+                        "1": {
+                            "1": "CurCourseTable",
+                            "2": "HisCourseTable"
+                        },
+                        "2": "CoursesManage"
+                    },
+                    "3": {
+                        "1": "EvaluateResult",
+                    },
+                    "4": {
+                        "1": "ApplyExam",
+                        "2": "UploadGrade"
+                    },
+                    "5": {
+                        "1": {
+                            "1": "CourseAlert",
+                            "2": "CoursesInfo"
+                        },
+                        "2": {
+                            "1": "FreeClassroom",
+                            "2": "OrderClassroom"
+                        }
+                    }
+                }
             }
         },
         mounted() {
@@ -236,8 +262,8 @@
                     key: '职称',
                     val: this.info.title
                 }, {
-                    key: '授课',
-                    val: '软件工程'
+                    key: '--',
+                    val: '----'
                 }]
             },
 

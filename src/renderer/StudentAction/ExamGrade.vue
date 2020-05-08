@@ -17,25 +17,64 @@
                 </el-menu>
             </el-col>
         </el-header>
-        <el-container style="height: 100%">
-            <div>404: 尚未开发</div>
-        </el-container>
+        <el-main style="height: 100%; -webkit-app-region: no-drag;">
+            <el-row style="width: 100%;">
+                <el-col>
+                    <el-table :data="course_ls" align="center">
+                        <el-table-column label="ID" prop="course_id"></el-table-column>
+                        <el-table-column label="课程" prop="name"></el-table-column>
+                        <el-table-column label="学分" prop="score"></el-table-column>
+                        <el-table-column label="起始（周）" prop="start_week"></el-table-column>
+                        <el-table-column label="周数" prop="weeks"></el-table-column>
+                        <el-table-column label="时间" prop="time_ls"></el-table-column>
+                        <el-table-column label="地点" prop="loc_ls"></el-table-column>
+                        <el-table-column label="成绩" prop="grade"></el-table-column>
+                    </el-table>
+                </el-col>
+            </el-row>
+        </el-main>
     </el-container>
 </template>
 
 <script>
+    import request from 'request-promise'
     export default {
         data() {
-            return {}
+            return {
+                course_ls: []
+            }
+        },
+        created() {
+            this.init_course_ls(0);
         },
         methods: {
             goback() {
-                this.$router.go(-1);
+                this.$router.push({name: 'student-dashboard'});
             },
 
             headerSelect(key, keyPath){
                 if(key === "1")console.log(key)
                 else console.log(key)
+            },
+
+            init_course_ls(depth = 0) {
+                if(depth > 5){
+                    this.$message.error('Max Tried Limited')
+                    return
+                }
+                this.course_ls = this.$storage.getSessionObject('AllStudentGrade')
+                if(this.course_ls === null) {
+                    request({
+                        uri: this.$storage.address() + 'course/GetGradesByStudent/' + this.$storage.getBindUser().user_id,
+                        method: 'GET',
+                        json: true
+                    }).then(res => {
+                        this.$storage.saveSessionObject('AllStudentGrade', res)
+                        this.init_course_ls(depth + 1)
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
+                }
             }
         }
     }
