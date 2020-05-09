@@ -153,7 +153,7 @@
         methods: {
             goback(){
                 this.$storage.saveUserInfo("null")
-                this.$storage.saveSessionObject('calendar', null)
+                this.$storage.saveSessionObject('Schedule', null)
                 this.$router.push({name: 'login-page'})
             },
 
@@ -167,14 +167,14 @@
                     this.$message.error('Max Tried Limited!')
                     return
                 }
-                let calendar = this.$storage.getSessionObject("calendar")
+                let calendar = this.$storage.getSessionObject("Schedule")
                 if(calendar === null) {
                     request({
                         uri: this.$storage.address() + 'course/Teacher/Schedule/' + this.user.user_id,
                         method: 'GET',
                         json: true
                     }).then(res => {
-                        this.$storage.saveSessionObject('calendar', res);
+                        this.$storage.saveSessionObject('Schedule', res);
                         this.init_calendar(depth + 1)
                     }).catch(error => {
                         this.$message.error(error)

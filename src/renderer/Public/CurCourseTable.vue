@@ -175,8 +175,7 @@
                         json: true
                     }).then(res => {
                         this.$storage.saveSessionObject('CourseInfos', res)
-                        this.course_ls = res;
-                        //this.init_table(depth + 1)
+                        this.init_table(depth + 1)
                     }).catch(error => {
                         this.$message.error(error)
                     })

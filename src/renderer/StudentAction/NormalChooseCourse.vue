@@ -17,20 +17,166 @@
                 </el-menu>
             </el-col>
         </el-header>
-        <el-container style="height: 100%">
-            <div>404: 尚未开发</div>
-        </el-container>
+        <el-main style="height: 100%; -webkit-app-region: no-drag">
+            <div align="center">
+                <el-button @click="submit_selection">提交选课</el-button>
+                <el-button @click="clear_all_selection">清除</el-button>
+            </div>
+            <el-table ref="course_list"
+                      :data="course_table"
+                      tooltip-effect="dark" style="width: 100%" @selection-change="selection_change">
+                <el-table-column type="selection" :selectable="isSelectable" v-model="selection"></el-table-column>
+                <el-table-column label="ID" prop="course_id"></el-table-column>
+                <el-table-column label="课程" prop="name"></el-table-column>
+                <el-table-column label="学分" sortable column-key="score" prop="score"></el-table-column>
+                <el-table-column label="起始周" sortable column-key="start_week" prop="start_week"></el-table-column>
+                <el-table-column label="周数" sortable column-key="weeks" prop="weeks"></el-table-column>
+                <el-table-column label="时间" prop="time_ls"></el-table-column>
+                <el-table-column label="地点" prop="loc_ls"></el-table-column>
+                <el-table-column label="余量" prop="rest"></el-table-column>
+            </el-table>
+        </el-main>
     </el-container>
 </template>
 
 <script>
+    import request from 'request-promise'
     export default {
         data() {
-            return {}
+            return {
+                course_table: [],
+                selection: [],
+                calendar: {},
+                select_calendar: []
+            }
+        },
+        created() {
+            this.init_calendar()
+            this.init_course_table()
         },
         methods: {
             goback() {
-                this.$router.go(-1);
+                this.$storage.saveSessionObject('calendar', null)
+                this.$router.push({name: 'student-dashboard'});
+            },
+
+            init_calendar(depth = 0) {
+                if(depth > 5){
+                    this.$message.error('Max Tried Limited!')
+                    return
+                }
+                let cls = this.$storage.getSessionObject('calendar')
+                if(cls === null)request({
+                    uri: this.$storage.address() + 'info/StudentCalendar/' + this.$storage.getBindUser().user_id,
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.$storage.saveSessionObject('calendar', res)
+                    this.init_calendar(depth + 1)
+                }).catch(error => {this.$message.error(error)});
+                else {
+                    this.calendar = {min_week: 20, max_week: -1, status: []}
+                    for(let i=0;i<180*6;++i)this.calendar.status.push(false);
+                    for(let i in cls) {
+                        let st_week = cls[i]['start_week']-1, end_week = cls[i]['start_week'] + cls[i]['weeks'] - 1;
+                        let ls = cls[i]['time_ls'].split(':');
+                        this.calendar.min_week = Math.min(this.calendar.min_week, st_week);
+                        this.calendar.max_week = Math.max(this.calendar.max_week, end_week);
+                        ls[0] = ls[0].split(',')
+                        ls[1] = ls[1].split('-')
+                        for(let wkd=st_week*7;wkd<end_week*7;++wkd)
+                            for(let idx in ls[0]){
+                                if(ls[1].length > 1)
+                                    for(let j=parseInt(ls[1][0])-1;j<parseInt(ls[1][1]);++j)
+                                        this.calendar.status[wkd + parseInt(ls[0][idx]) + j] = true;
+                                else this.calendar.status[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])] = true;
+                            }
+                    }
+                    this.select_calendar = []
+                    for(let i=0;i<180*6;++i)this.select_calendar.push(false);
+                }
+            },
+
+            init_course_table() {
+                this.course_table = this.$storage.getSessionObject('SelectableCourse')
+                if(this.course_table === null)request({
+                    uri: this.$storage.address() + 'course/SelectableCourse',
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.course_table = res;
+                    this.$storage.saveSessionObject('SelectableCourse', res);
+                }).catch(error => {this.$message.error(error)});
+            },
+
+            isSelectable(row, index) {
+                let st_week = row.start_week-1, end_week = row.start_week + row.weeks - 1;
+                if(st_week > this.calendar.max_week)return true;
+                let ls = row.time_ls.split(':');
+                ls[0] = ls[0].split(',')
+                ls[1] = ls[1].split('-')
+                for(let wkd=st_week*7;wkd<end_week*7;++wkd)
+                    for(let idx in ls[0]) {
+                        if(ls[1].length > 1)
+                            for(let j=parseInt(ls[1][0])-1;j<parseInt(ls[1][1]);++j)
+                                if(this.calendar.status[wkd + parseInt(ls[0][idx]) + j]
+                                    || this.select_calendar[wkd + parseInt(ls[0][idx]) + j]
+                                )return false;
+                        else if(this.calendar.status[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])]
+                            || this.select_calendar[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])])return false;
+                    }
+                return true;
+            },
+
+            selection_change(val) {
+                for(let i in val) {
+                    let st_week = val[i]['start_week']-1, end_week = val[i]['start_week'] + val[i]['weeks'] - 1;
+                    let ls = val[i]['time_ls'].split(':');
+                    ls[0] = ls[0].split(',')
+                    ls[1] = ls[1].split('-')
+                    for(let wkd=st_week*7;wkd<end_week*7;++wkd)
+                        for(let idx in ls[0]){
+                            if(ls[1].length > 1)
+                                for(let j=parseInt(ls[1][0])-1;j<parseInt(ls[1][1]);++j)
+                                    this.select_calendar[wkd + parseInt(ls[0][idx]) + j] = true;
+                            else this.select_calendar[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])] = true;
+                        }
+                }
+            },
+
+            submit_selection() {
+                let post_json = {
+                    user_id: this.$storage.getBindUser().user_id,
+                    course_ls: []
+                }
+                for(let i in this.selection){
+                    post_json.course_ls.push(this.selection[i].course_id);
+                }
+                request({
+                    uri: this.$storage.address() + 'course/SelectCourse',
+                    method: 'POST',
+                    json: post_json
+                }).then(res => {
+                    for(let i in this.selection){
+                        if(!res[this.selection[i].course_id])continue;
+                        let st_week = this.selection[i].start_week-1, end_week = this.selection[i].start_week + this.selection[i].weeks - 1;
+                        let ls = this.selection[i].time_ls.split(':');
+                        ls[0] = ls[0].split(',')
+                        ls[1] = ls[1].split('-')
+                        for(let wkd=st_week*7;wkd<end_week*7;++wkd)
+                            for(let idx in ls[0]) {
+                                if(ls[1].length > 1)
+                                    for(let j=parseInt(ls[1][0])-1;j<parseInt(ls[1][1]);++j)
+                                        this.calendar.status[wkd + parseInt(ls[0][idx]) + j] = true;
+                                else this.calendar.status[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])] = true;
+                            }
+                    }
+                }).catch(error => {this.$message.error(error)})
+                console.log(post_json);
+            },
+
+            clear_all_selection() {
+                this.$refs.course_list.clearSelection();
             },
 
             headerSelect(key, keyPath){

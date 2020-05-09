@@ -55,7 +55,7 @@
                             <el-menu-item index="2-1-1">本学期课表</el-menu-item>
                             <el-menu-item index="2-1-2">历史课表</el-menu-item>
                         </el-submenu>
-                        <el-submenu index="2-2">
+                        <el-submenu index="2-2" :disabled="elective_flag">
                             <template slot="title">选课管理</template>
                             <el-menu-item index="2-2-1">特殊选课</el-menu-item>
                             <el-menu-item index="2-2-2">普通选课</el-menu-item>
@@ -135,6 +135,7 @@
 <script>
 import request from 'request-promise'
 import echarts from 'echarts'
+import chinaJson from 'echarts/map/json/china.json'
 export default {
     data() {
         return {
@@ -198,10 +199,11 @@ export default {
                     }
                 }
             },
-            elective_flag: false
+            elective_flag: true
         }
     },
     mounted() {
+        this.$echarts.registerMap('china', chinaJson);
         this.init_calendar(0);
         this.drawCharts();
     },
@@ -213,7 +215,7 @@ export default {
     methods: {
         goback(){
             this.$storage.saveUserInfo("null")
-            this.$storage.saveSessionObject('calendar', null)
+            this.$storage.saveSessionObject('Schedule', null)
             this.$router.push({name: 'login-page'})
         },
 
@@ -227,7 +229,7 @@ export default {
                 this.$message.error('Max Tried Limited!')
                 return
             }
-            let calendar = this.$storage.getSessionObject("calendar")
+            let calendar = this.$storage.getSessionObject("Schedule")
             if(calendar === null) {
                 console.log("WHAT THE FUCK!")
                 request({
@@ -235,7 +237,7 @@ export default {
                     method: 'GET',
                     json: true
                 }).then(res => {
-                    this.$storage.saveSessionObject('calendar', res);
+                    this.$storage.saveSessionObject('Schedule', res);
                     this.init_calendar(depth + 1)
                 }).catch(error => {
                     this.$message.error(error)
@@ -288,6 +290,7 @@ export default {
         init_info() {
             this.info = this.$storage.getUserInfo();
             if(this.info) {
+                this.elective_flag = this.$storage.getSessionObject('elective_flag')
                 this.init_info_table();
                 return
             }
@@ -299,6 +302,14 @@ export default {
                 this.info = res;
                 this.info.gender = res.gender?'男':'女'
                 this.$storage.saveUserInfo(this.info)
+                request({
+                    uri: this.$storage.address() + 'activity/QryActivity/elective',
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.elective_flag = !res.status;
+                    this.$storage.saveSessionObject('elective_flag', !res.status)
+                }).catch(error => {this.$message.error(error)})
                 this.init_info_table();
             }).catch(err => {
                 this.$message.error(err);
@@ -348,93 +359,63 @@ export default {
             return Math.ceil((date - fromDate) / 8.64e7).toString()
         },
 
-        drawCharts() {
+        _draw() {
+            let index = this.$storage.getSessionObject('GeoIndex')
             let chart = echarts.init(document.getElementById('CPLchart'))
             const option = {
                 title: {
-                    text: '保有储量变化图',
-                    subtext: '一次能源'
+                    text: '地理定位',
+                    subtext: '数据来源：ip-api',
+                    left: 'left',
                 },
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'item'
                 },
-                legend: {
-                    data: ['煤', '石油', '天然气']
-                },
-                toolbox: {
-                    show: true,
-                    feature: {
-                        dataView: {show: true, readOnly: false},
-                        magicType: {show: true, type: ['line', 'bar']},
-                        restore: {show: true},
-                        saveAsImage: {show: true}
-                    }
-                },
-                calculable: true,
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017'],
-                        splitNumber: 10
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value'
-                    }
-                ],
-                series: [
-                    {
-                        name: '煤',
-                        type: 'bar',
-                        data: [1683.47, 1654.23, 1640.12, 1641.6, 1639.68, 1642.7, 1610.41, 1639.45, 1722.2],
-                        markPoint: {
-                            data: [
-                                {type: 'max', name: '最大值'},
-                                {type: 'min', name: '最小值'}
-                            ]
-                        },
-                        markLine: {
-                            data: [
-                                {type: 'average', name: '平均值'}
-                            ]
+                geo: {
+                    map: 'china',
+                    label: {
+                        emphasis: {
+                            show: false
                         }
                     },
-                    {
-                        name: '石油',
-                        type: 'bar',
-                        data: [22490.2, 24947.67, 29844.34, 31397.94, 33713, 36300.8, 38445.3, 38375.6, 38158.7],
-                        markPoint: {
-                            data: [
-                                {type: 'max', name: '最大值'},
-                                {type: 'min', name: '最小值'}
-                            ]
+                    roam: true,
+                    itemStyle: {
+                        normal: {
+                            areaColor: '#132937',
+                            borderColor: '#0692a4'
                         },
-                        markLine: {
-                            data: [
-                                {type: 'average', name: '平均值'}
-                            ]
-                        }
-                    },
-                    {
-                        name: '天然气',
-                        type: 'bar',
-                        data: [5502.54, 5628.11, 5478, 6376.26, 6231.14, 8047.88, 7857.1, 7802.5, 8695.01],
-                        markPoint: {
-                            data: [
-                                {type: 'max', name: '最大值'},
-                                {type: 'min', name: '最小值'}
-                            ]
-                        },
-                        markLine: {
-                            data: [
-                                {type: 'average', name: '平均值'}
-                            ]
+                        emphasis: {
+                            areaColor: '#0b1c2d'
                         }
                     }
-                ]
+                },
+                series: {
+                    type: 'effectScatter',
+                    coordinateSystem: 'geo',
+                    zlevel: 2,
+                    rippleEffect: {
+                        brushType: 'stroke'
+                    },
+                    itemStyle: {normal: {color: '#a6c84c'}},
+                    data: [{
+                        name: index.regionName,
+                        value: [index.lon, index.lat, 100]
+                    }]
+                }
             };
             chart.setOption(option);
+        },
+
+        drawCharts() {
+            if(this.$storage.getSessionObject('GeoIndex') === null)request({
+                uri: 'http://ip-api.com/json',
+                method: 'GET',
+                json: true
+            }).then(res => {
+                this.$storage.saveSessionObject('GeoIndex', res)
+                this._draw();
+            }).catch(error => {this.$message.error(error)});
+            else this._draw();
         }
     }
 };

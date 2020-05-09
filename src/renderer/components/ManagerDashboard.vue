@@ -68,7 +68,7 @@
                 activeIndex: '',
                 fromDate: '',
                 toDate: '',
-                elective_flag: '关闭选课',
+                elective_flag: false,
                 action_tree: {
                     "1": {
                         "1": "StudentInfoManage",
@@ -83,12 +83,18 @@
             }
         },
         mounted() {
-            this.init_info();
-            this.drawCharts();
+            request({
+                uri: this.$storage.address() + 'activity/QryActivity/elective',
+                method: 'GET',
+                json: true
+            }).then(res => {
+                this.elective_flag = res.status
+            }).catch(error => {this.$message.error(error)})
         },
         created() {
             this.user = this.$storage.getBindUser();
             this.init_date();
+            this.init_info();
         },
         methods: {
             goback(){
@@ -99,7 +105,7 @@
                 let road = key.split('-')
                 let act = this.action_tree;
                 for(const i in road)act = act[road[i]]
-                if(act === 'ChangeInfo') this.$storage.saveSessionObject('role', 0);
+                if(act === 'ChangeInfo') this.$storage.saveSessionObject('role', 2);
                 this.$router.push({name: act})
             },
 
@@ -110,7 +116,7 @@
                     return
                 }
                 request({
-                    uri: this.$storage.address() + 'info/student/' + this.user.user_id,
+                    uri: this.$storage.address() + 'info/manager/' + this.user.user_id,
                     method: 'GET',
                     json: true
                 }).then(res => {
@@ -152,7 +158,7 @@
             },
 
             elective() {
-                if(this.elective_flag === '开启选课')request({
+                if(this.elective_flag)request({
                     uri: this.$storage.address() + 'activity/EnableActivity/elective',
                     method: 'GET',
                     json: true
