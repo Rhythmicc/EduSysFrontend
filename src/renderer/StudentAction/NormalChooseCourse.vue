@@ -60,18 +60,21 @@
                 this.$router.push({name: 'student-dashboard'});
             },
 
-            init_calendar(depth = 0) {
+            init_calendar(depth = 0, _force=false) {
                 if(depth > 5){
                     this.$message.error('Max Tried Limited!')
                     return
                 }
                 let cls = this.$storage.getSessionObject('calendar')
-                if(cls === null)request({
+                if(cls === null || _force || cls.hasOwnProperty('status'))request({
                     uri: this.$storage.address() + 'info/StudentCalendar/' + this.$storage.getBindUser().user_id,
                     method: 'GET',
                     json: true
                 }).then(res => {
-                    this.$storage.saveSessionObject('calendar', res)
+                    if(res.hasOwnProperty('status')){
+                        if(res.hasOwnProperty('msg')) this.$storage.saveSessionObject('calendar', [])
+                        else return this.init_calendar(depth + 1, true);
+                    } else this.$storage.saveSessionObject('calendar', res)
                     this.init_calendar(depth + 1)
                 }).catch(error => {this.$message.error(error)});
                 else {
@@ -111,7 +114,7 @@
 
             isSelectable(row, index) {
                 let st_week = row.start_week-1, end_week = row.start_week + row.weeks - 1;
-                if(st_week > this.calendar.max_week)return true;
+                if(this.calendar.max_week > 0 && st_week > this.calendar.max_week)return true;
                 let ls = row.time_ls.split(':');
                 ls[0] = ls[0].split(',')
                 ls[1] = ls[1].split('-')
@@ -142,6 +145,7 @@
                             else this.select_calendar[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])] = true;
                         }
                 }
+                this.selection = val;
             },
 
             submit_selection() {
@@ -149,30 +153,37 @@
                     user_id: this.$storage.getBindUser().user_id,
                     course_ls: []
                 }
-                for(let i in this.selection){
-                    post_json.course_ls.push(this.selection[i].course_id);
+                for(let i in this.selection)post_json.course_ls.push(this.selection[i].course_id);
+                if(!post_json.course_ls.length){
+                    this.$message.error('请选择课程')
+                    return
                 }
                 request({
                     uri: this.$storage.address() + 'course/SelectCourse',
                     method: 'POST',
                     json: post_json
                 }).then(res => {
-                    for(let i in this.selection){
-                        if(!res[this.selection[i].course_id])continue;
-                        let st_week = this.selection[i].start_week-1, end_week = this.selection[i].start_week + this.selection[i].weeks - 1;
-                        let ls = this.selection[i].time_ls.split(':');
-                        ls[0] = ls[0].split(',')
-                        ls[1] = ls[1].split('-')
-                        for(let wkd=st_week*7;wkd<end_week*7;++wkd)
-                            for(let idx in ls[0]) {
-                                if(ls[1].length > 1)
-                                    for(let j=parseInt(ls[1][0])-1;j<parseInt(ls[1][1]);++j)
-                                        this.calendar.status[wkd + parseInt(ls[0][idx]) + j] = true;
-                                else this.calendar.status[wkd + parseInt(ls[0][idx]) + parseInt(ls[1][0])] = true;
-                            }
+                    let false_id = []
+                    let cls = this.$storage.getSessionObject('calendar')
+                    for(let i in this.selection) {
+                        if(!res[this.selection[i].course_id]){
+                            false_id.push(this.selection[i].name);
+                            continue;
+                        }
+                        cls.push({
+                            'start_week': this.selection[i].start_week,
+                            'weeks': this.selection[i].weeks,
+                            'time_ls': this.selection[i].time_ls
+                        })
                     }
+                    this.$storage.saveSessionObject('calendar', cls);
+                    if(false_id.length > 0) this.$message.error('失败课程:' + false_id.toString())
+                    else this.$message({
+                        message: '选课成功',
+                        type: 'success'
+                    });
+                    this.$router.go(0);
                 }).catch(error => {this.$message.error(error)})
-                console.log(post_json);
             },
 
             clear_all_selection() {

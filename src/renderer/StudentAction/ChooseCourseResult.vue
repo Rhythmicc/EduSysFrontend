@@ -18,24 +18,78 @@
             </el-col>
         </el-header>
         <el-container style="height: 100%">
-            <div>404: 尚未开发</div>
+            <el-table ref="course_list"
+                      :data="DropableCourses"
+                      tooltip-effect="dark" style="width: 100%">
+                <el-table-column label="ID" prop="course_id"></el-table-column>
+                <el-table-column label="课程" prop="name"></el-table-column>
+                <el-table-column label="学分" sortable column-key="score" prop="score"></el-table-column>
+                <el-table-column label="起始周" sortable column-key="start_week" prop="start_week"></el-table-column>
+                <el-table-column label="周数" sortable column-key="weeks" prop="weeks"></el-table-column>
+                <el-table-column label="时间" prop="time_ls"></el-table-column>
+                <el-table-column label="地点" prop="loc_ls"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </el-container>
     </el-container>
 </template>
 
 <script>
+import request from "request-promise";
+
 export default {
     data() {
-        return {}
+        return {
+            DropableCourses: []
+        }
+    },
+    created() {
+        this.init_course_ls()
     },
     methods: {
         goback() {
-            this.$router.go(-1);
+            this.$storage.saveSessionObject('DropableCourse', null);
+            this.$router.push({name: 'student-dashboard'});
         },
 
         headerSelect(key, keyPath){
             if(key === "1")console.log(key)
             else console.log(key)
+        },
+
+        init_course_ls(depth = 0) {
+            if(depth > 5){
+                this.$message.error('Max Tried Limited')
+                return
+            }
+            this.DropableCourses = this.$storage.getSessionObject('DropableCourse')
+            if(this.DropableCourses === null)request({
+                uri: this.$storage.address() + 'course/DropableCourse/' + this.$storage.getBindUser().user_id,
+                method: 'GET',
+                json: true
+            }).then(res => {
+                this.$storage.saveSessionObject('DropableCourse', res);
+                this.init_course_ls(depth + 1)
+            }).catch(error => {this.$message.error(error)});
+        },
+
+        handleDelete(index, row) {
+            this.DropableCourses.splice(index, 1);
+            request({
+                uri: this.$storage.address() + 'course/DropCourse/' + this.$storage.getBindUser().user_id + '?cid=' + row.course_id,
+                method: 'GET',
+                json: true
+            }).then(res => {
+                this.DropableCourses.splice(index, 1);
+                this.$message({
+                    message: res.status?'退课成功': '退课失败',
+                    type: res.status?'success': 'error'
+                })
+            }).catch(error => {this.$message.error(error)});
         }
     }
 }

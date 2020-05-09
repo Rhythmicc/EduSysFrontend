@@ -60,7 +60,6 @@
                             <el-menu-item index="2-2-1">特殊选课</el-menu-item>
                             <el-menu-item index="2-2-2">普通选课</el-menu-item>
                             <el-menu-item index="2-2-3">选课结果</el-menu-item>
-                            <el-menu-item index="2-2-4">退课申请</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                     <el-submenu index="3">
@@ -175,7 +174,6 @@ export default {
                         "1": "SpecialChooseCourse",
                         "2": "NormalChooseCourse",
                         "3": "ChooseCourseResult",
-                        "4": "DropCourse"
                     }
                 },
                 "3": {

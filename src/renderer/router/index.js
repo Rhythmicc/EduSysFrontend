@@ -121,11 +121,6 @@ export default new Router({
       component: require('@/StudentAction/ChooseCourseResult').default
     },
     {
-      path: '/DropCourse',
-      name: 'DropCourse',
-      component: require('@/StudentAction/DropCourse').default
-    },
-    {
       path: '/ComprehensiveInquiry',
       name: 'ComprehensiveInquiry',
       component: require('@/StudentAction/ComprehensiveInquiry').default
