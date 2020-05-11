@@ -78,7 +78,6 @@ export default {
         },
 
         handleDelete(index, row) {
-            this.DropableCourses.splice(index, 1);
             request({
                 uri: this.$storage.address() + 'course/DropCourse/' + this.$storage.getBindUser().user_id + '?cid=' + row.course_id,
                 method: 'GET',
