@@ -3,7 +3,7 @@ const info_key = "UserInfo"
 
 export default class backend {
     address() {
-        return 'http://softwaredesign.rhythmlian.cn/'
+        return 'http://118.31.73.98/'
     }
     getBindUser(){
         return JSON.parse(localStorage.getItem(user_key));
