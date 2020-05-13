@@ -102,6 +102,7 @@
 <script>
     import request from 'request-promise'
     import echarts from 'echarts'
+    import chinaJson from 'echarts/map/json/china.json'
     export default {
         data() {
             return {
@@ -142,6 +143,7 @@
             }
         },
         mounted() {
+            this.$echarts.registerMap('china', chinaJson);
             this.init_calendar(0);
             this.drawCharts();
         },
@@ -220,7 +222,8 @@
                 let road = key.split('-')
                 let act = this.action_tree;
                 for(const i in road)act = act[road[i]]
-                if(act === 'ChangeInfo') this.$storage.saveSessionObject('role', 0);
+                if(act === 'ChangeInfo') this.$storage.saveSessionObject('role', 1);
+                console.log(act)
                 this.$router.push({name: act})
             },
 
@@ -287,93 +290,63 @@
                 return Math.ceil((date - fromDate) / 8.64e7).toString()
             },
 
-            drawCharts() {
+            _draw() {
+                let index = this.$storage.getSessionObject('GeoIndex')
                 let chart = echarts.init(document.getElementById('CPLchart'))
                 const option = {
                     title: {
-                        text: '保有储量变化图',
-                        subtext: '一次能源'
+                        text: '地理定位',
+                        subtext: '数据来源：ip-api',
+                        left: 'left',
                     },
                     tooltip: {
-                        trigger: 'axis'
+                        trigger: 'item'
                     },
-                    legend: {
-                        data: ['煤', '石油', '天然气']
-                    },
-                    toolbox: {
-                        show: true,
-                        feature: {
-                            dataView: {show: true, readOnly: false},
-                            magicType: {show: true, type: ['line', 'bar']},
-                            restore: {show: true},
-                            saveAsImage: {show: true}
-                        }
-                    },
-                    calculable: true,
-                    xAxis: [
-                        {
-                            type: 'category',
-                            data: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017'],
-                            splitNumber: 10
-                        }
-                    ],
-                    yAxis: [
-                        {
-                            type: 'value'
-                        }
-                    ],
-                    series: [
-                        {
-                            name: '煤',
-                            type: 'bar',
-                            data: [1683.47, 1654.23, 1640.12, 1641.6, 1639.68, 1642.7, 1610.41, 1639.45, 1722.2],
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
-                            },
-                            markLine: {
-                                data: [
-                                    {type: 'average', name: '平均值'}
-                                ]
+                    geo: {
+                        map: 'china',
+                        label: {
+                            emphasis: {
+                                show: false
                             }
                         },
-                        {
-                            name: '石油',
-                            type: 'bar',
-                            data: [22490.2, 24947.67, 29844.34, 31397.94, 33713, 36300.8, 38445.3, 38375.6, 38158.7],
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
+                        roam: true,
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#132937',
+                                borderColor: '#0692a4'
                             },
-                            markLine: {
-                                data: [
-                                    {type: 'average', name: '平均值'}
-                                ]
-                            }
-                        },
-                        {
-                            name: '天然气',
-                            type: 'bar',
-                            data: [5502.54, 5628.11, 5478, 6376.26, 6231.14, 8047.88, 7857.1, 7802.5, 8695.01],
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
-                            },
-                            markLine: {
-                                data: [
-                                    {type: 'average', name: '平均值'}
-                                ]
+                            emphasis: {
+                                areaColor: '#0b1c2d'
                             }
                         }
-                    ]
+                    },
+                    series: {
+                        type: 'effectScatter',
+                        coordinateSystem: 'geo',
+                        zlevel: 2,
+                        rippleEffect: {
+                            brushType: 'stroke'
+                        },
+                        itemStyle: {normal: {color: '#a6c84c'}},
+                        data: [{
+                            name: index.regionName,
+                            value: [index.lon, index.lat, 100]
+                        }]
+                    }
                 };
                 chart.setOption(option);
+            },
+
+            drawCharts() {
+                if(this.$storage.getSessionObject('GeoIndex') === null)request({
+                    uri: 'http://ip-api.com/json',
+                    method: 'GET',
+                    json: true
+                }).then(res => {
+                    this.$storage.saveSessionObject('GeoIndex', res)
+                    this._draw();
+                }).catch(error => {this.$message.error(error)});
+                else this._draw();
             }
         }
     };

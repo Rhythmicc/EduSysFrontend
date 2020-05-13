@@ -99,14 +99,14 @@
                     this.$message.error('Max Tried Limited')
                     return
                 }
-                let cls = this.$storage.getSessionObject(this.student_id);
+                let cls = this.$storage.getSessionObject(this.course_id);
                 if(cls === null) {
                     request({
                         uri: this.$storage.address() + 'course/GetStudentsByCourseId/' + this.course_id,
                         method: 'GET',
                         json: true
                     }).then(res => {
-                        this.$storage.saveSessionObject(this.student_id, res)
+                        this.$storage.saveSessionObject(this.course_id, res)
                         this.selectCourseId(depth + 1)
                     }).catch(error => {
                         this.$message.error(error)
