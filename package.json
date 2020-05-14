@@ -9,6 +9,7 @@
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
     "build:all": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder -mwl",
+    "build:linux": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",

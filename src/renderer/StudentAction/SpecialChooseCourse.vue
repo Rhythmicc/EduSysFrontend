@@ -60,8 +60,8 @@
                     }
                 }).then(res => {
                     this.$message({
-                        message: res.status?'申请已提交': res.msg,
-                        type: res.status?'success': 'error'
+                        message: res[this.course_id]?'申请已提交': '已申请或无法申请',
+                        type: res[this.course_id]?'success': 'error'
                     })
                 }).catch(error => {this.$message.error(error)})
             }
