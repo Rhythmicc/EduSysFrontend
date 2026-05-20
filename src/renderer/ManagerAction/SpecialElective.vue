@@ -37,7 +37,7 @@
 </template>
 
 <script>
-    import request from 'request-promise'
+    import request from '../utils/request'
     export default {
         data() {
             return {

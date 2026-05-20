@@ -100,7 +100,7 @@
     </el-container>
 </template>
 <script>
-    import request from 'request-promise'
+    import request from '../utils/request'
     import echarts from 'echarts'
     import chinaJson from 'echarts/map/json/china.json'
     export default {
