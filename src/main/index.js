@@ -52,7 +52,8 @@ function createMainWindow() {
     //icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
     webPreferences: {
       webSecurity: false,
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
   
@@ -105,7 +106,7 @@ const getMenuData = function () {
                   click() {
                       //
                       if (mainWindow) {
-                          mainWindow.webContents.session.clearCache(function () {
+                          mainWindow.webContents.session.clearCache().then(() => {
                               mainWindow.loadURL(util.mainURL);
                           });
                       }

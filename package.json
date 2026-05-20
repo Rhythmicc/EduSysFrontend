@@ -54,7 +54,7 @@
     }
   },
   "dependencies": {
-    "axios": "^0.21.2",
+    "axios": "^1.15.2",
     "echarts": "^4.7.0",
     "electron-json-storage": "^4.1.8",
     "element-ui": "^2.13.1",
@@ -81,7 +81,7 @@
     "css-loader": "^5.2.7",
     "del": "^3.0.0",
     "devtron": "npm:@electron/devtron@^2.1.1",
-    "electron": "^23.0.0",
+    "electron": "^42.0.0",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^4.0.0",
     "electron-builder": "^26.11.0",
